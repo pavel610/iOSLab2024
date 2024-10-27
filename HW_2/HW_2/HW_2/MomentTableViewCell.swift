@@ -11,7 +11,7 @@ import UIKit
 class MomentTableViewCell: UITableViewCell {
     private var images: [UIImage] = []
     
-    lazy var contentStack: UIStackView = {
+    private lazy var contentStack: UIStackView = {
         var contentStack = UIStackView()
         contentStack.axis = .vertical
         contentStack.spacing = 5
@@ -22,7 +22,7 @@ class MomentTableViewCell: UITableViewCell {
         return contentStack
     }()
     
-    lazy var imagesStack: UIStackView = {
+    private lazy var imagesStack: UIStackView = {
         var imagesStack = UIStackView()
         imagesStack.axis = .horizontal
         imagesStack.spacing = 5
@@ -31,7 +31,7 @@ class MomentTableViewCell: UITableViewCell {
         return imagesStack
     }()
     
-    lazy var descriptionLabel: UILabel = {
+    private lazy var descriptionLabel: UILabel = {
         var label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 5
@@ -39,7 +39,7 @@ class MomentTableViewCell: UITableViewCell {
         return label
     }()
     
-    lazy var dateLabel: UILabel = {
+    private lazy var dateLabel: UILabel = {
         var label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .gray
@@ -48,7 +48,7 @@ class MomentTableViewCell: UITableViewCell {
         return label
     }()
     
-    lazy var descriptionStack: UIStackView = {
+    private lazy var descriptionStack: UIStackView = {
         var stack = UIStackView()
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical

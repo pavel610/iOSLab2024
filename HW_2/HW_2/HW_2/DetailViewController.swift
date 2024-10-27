@@ -29,7 +29,7 @@ class DetailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    lazy var scrollView: UIScrollView = {
+    private lazy var scrollView: UIScrollView = {
         var scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.showsVerticalScrollIndicator = false
@@ -37,7 +37,7 @@ class DetailViewController: UIViewController {
         return scrollView
     }()
     
-    lazy var contentView: UIView = {
+    private lazy var contentView: UIView = {
         var view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(imagesStack)
@@ -45,7 +45,7 @@ class DetailViewController: UIViewController {
         return view
     }()
     
-    lazy var imagesStack: UIStackView = {
+    private lazy var imagesStack: UIStackView = {
         var imagesStack = UIStackView()
         imagesStack.axis = .vertical
         imagesStack.spacing = 5
@@ -54,7 +54,7 @@ class DetailViewController: UIViewController {
         return imagesStack
     }()
     
-    lazy var descriptionLabel: UILabel = {
+    private lazy var descriptionLabel: UILabel = {
         var label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 0
@@ -62,7 +62,7 @@ class DetailViewController: UIViewController {
         return label
     }()
     
-    lazy var dateLabel: UILabel = {
+    private lazy var dateLabel: UILabel = {
         var label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .gray
@@ -71,7 +71,7 @@ class DetailViewController: UIViewController {
         return label
     }()
     
-    lazy var descriptionStack: UIStackView = {
+    private lazy var descriptionStack: UIStackView = {
         var stack = UIStackView()
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical

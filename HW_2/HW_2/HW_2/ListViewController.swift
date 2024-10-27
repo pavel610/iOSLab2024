@@ -13,7 +13,7 @@ class ListViewController: UIViewController {
         case main
     }
     
-    lazy var tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         var tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
@@ -21,8 +21,8 @@ class ListViewController: UIViewController {
         return tableView
     }()
     
-    var dataSource: UITableViewDiffableDataSource<TableSection, Moment>?
-    var moments: [Moment] = []
+    private var dataSource: UITableViewDiffableDataSource<TableSection, Moment>?
+    private var moments: [Moment] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()

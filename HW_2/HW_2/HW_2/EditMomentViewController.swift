@@ -32,7 +32,7 @@ class EditMomentViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    lazy var photoLabel: UILabel = {
+    private lazy var photoLabel: UILabel = {
         var label = UILabel()
         label.text = "Фото"
         label.font = .systemFont(ofSize: 25, weight: .bold)
@@ -40,7 +40,7 @@ class EditMomentViewController: UIViewController {
         return label
     }()
     
-    lazy var descrLabel: UILabel = {
+    private lazy var descrLabel: UILabel = {
         var label = UILabel()
         label.text = "Описание"
         label.font = .systemFont(ofSize: 25, weight: .bold)
@@ -48,7 +48,7 @@ class EditMomentViewController: UIViewController {
         return label
     }()
     
-    lazy var collectionView: UICollectionView = {
+    private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 120, height: 120)
         layout.minimumLineSpacing = 10
@@ -63,7 +63,7 @@ class EditMomentViewController: UIViewController {
         return collectionView
     }()
     
-    lazy var descrTextView: UITextView = {
+    private lazy var descrTextView: UITextView = {
         var textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.font = .systemFont(ofSize: 16)

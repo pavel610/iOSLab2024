@@ -10,7 +10,7 @@ import UIKit
 
 class ImageCell: UICollectionViewCell {
 
-    private let imageView: UIImageView = {
+    private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -18,7 +18,7 @@ class ImageCell: UICollectionViewCell {
         return imageView
     }()
     
-    private let deleteButton: UIButton = {
+    private lazy var deleteButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("X", for: .normal)
         button.backgroundColor = .red
