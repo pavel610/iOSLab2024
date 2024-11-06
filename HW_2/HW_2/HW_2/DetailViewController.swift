@@ -143,7 +143,27 @@ class DetailViewController: UIViewController {
             let bottomImage = createImageView(with: images[2])
             imagesStack.addArrangedSubview(topStack)
             imagesStack.addArrangedSubview(bottomImage)
-            
+        case 4:
+            let topStack: UIStackView = {
+                let stackView = UIStackView()
+                stackView.axis = .horizontal
+                stackView.spacing = 5
+                stackView.distribution = .fillEqually
+                stackView.addArrangedSubview(createImageView(with: images[0]))
+                stackView.addArrangedSubview(createImageView(with: images[1]))
+                return stackView
+            }()
+            let bottomStack: UIStackView = {
+                let stackView = UIStackView()
+                stackView.axis = .horizontal
+                stackView.spacing = 5
+                stackView.distribution = .fillEqually
+                stackView.addArrangedSubview(createImageView(with: images[2]))
+                stackView.addArrangedSubview(createImageView(with: images[3]))
+                return stackView
+            }()
+            imagesStack.addArrangedSubview(topStack)
+            imagesStack.addArrangedSubview(bottomStack)
         default:
             break
         }
