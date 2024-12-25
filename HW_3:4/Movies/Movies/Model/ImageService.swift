@@ -10,11 +10,7 @@ class ImageService {
     static let shared = ImageService()
     private init() {}
     
-    let cache: NSCache<NSURL, NSData> = {
-        let cache = NSCache<NSURL, NSData> ()
-        cache.countLimit = 20
-        return cache
-    }()
+    let cache = NSCache<NSURL, NSData>()
     
     let session: URLSession = {
         let session = URLSession(configuration: .default)

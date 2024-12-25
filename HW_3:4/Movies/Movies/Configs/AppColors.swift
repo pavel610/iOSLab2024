@@ -12,4 +12,5 @@ enum AppColors {
     static let tabBarItemColor = UIColor.tabBarItem
     static let searchGray = UIColor.searchGray
     static let titleGray = UIColor.titleGray
+    static let descriptionColor = UIColor(named: "DescriptionColor")
 }

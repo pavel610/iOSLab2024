@@ -6,7 +6,7 @@
 //
 import UIKit
 
-class TopListDataSource: NSObject, UICollectionViewDataSource {
+class TopListDataSource: NSObject, DataSourceProtocol {
     private var dataSource: [Movie]
     
     init(movies: [Movie]) {
@@ -27,5 +27,13 @@ class TopListDataSource: NSObject, UICollectionViewDataSource {
         }
         cell.configure(with: dataSource[indexPath.item], index: indexPath.item)
         return cell
+    }
+    
+    func getItemByIndex(_ index: Int) -> Movie {
+        dataSource[index]
+    }
+    
+    func getItems() -> [Movie] {
+        dataSource
     }
 }

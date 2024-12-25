@@ -43,13 +43,14 @@ class CustomTabBarController: UITabBarController {
         let stackView: UIStackView = {
             let stackView = UIStackView()
             stackView.axis = .horizontal
+            stackView.alignment = .center
             stackView.distribution = .equalSpacing
             stackView.translatesAutoresizingMaskIntoConstraints = false
             return stackView
         }()
         
-        let homeButton = createTabBarItem(title: "Home", image: UIImage.home, tag: 0)
-        let profileButton = createTabBarItem(title: "Watch list", image: UIImage.saved, tag: 1)
+        let homeButton = createTabBarItem(title: "Главная", image: UIImage.home, tag: 0)
+        let profileButton = createTabBarItem(title: "Избранное", image: UIImage.saved, tag: 1)
         
         tabBarItems = [homeButton, profileButton] // Сохраняем кнопки для изменения их состояния
         
@@ -60,8 +61,8 @@ class CustomTabBarController: UITabBarController {
         customTabBarView.addSubview(stackView)
         
         NSLayoutConstraint.activate([
-            stackView.centerXAnchor.constraint(equalTo: customTabBarView.centerXAnchor),
-            stackView.centerYAnchor.constraint(equalTo: customTabBarView.centerYAnchor, constant: -10),
+            stackView.topAnchor.constraint(equalTo: customTabBarView.topAnchor),
+            stackView.bottomAnchor.constraint(equalTo: customTabBarView.bottomAnchor, constant: -10),
             stackView.leadingAnchor.constraint(equalTo: customTabBarView.leadingAnchor, constant: 60),
             stackView.trailingAnchor.constraint(equalTo: customTabBarView.trailingAnchor, constant: -60)
         ])

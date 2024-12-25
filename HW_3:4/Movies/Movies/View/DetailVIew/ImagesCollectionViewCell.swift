@@ -1,13 +1,13 @@
 //
-//  TopCollectionViewCell.swift
+//  ImagesCollectionViewCell.swift
 //  Movies
 //
-//  Created by Павел Калинин on 21.12.2024.
+//  Created by Павел Калинин on 24.12.2024.
 //
 
 import UIKit
 
-class TopCollectionViewCell: UICollectionViewCell {
+class ImagesCollectionViewCell: UICollectionViewCell {
     private lazy var activityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView()
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
@@ -20,18 +20,7 @@ class TopCollectionViewCell: UICollectionViewCell {
         var imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 16
         return imageView
-    }()
-    
-    private lazy var numberLabel: UILabel = {
-        var label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.contentMode = .scaleAspectFill
-        label.font = .systemFont(ofSize: 95, weight: .bold)
-        label.textColor = .white
-        return label
     }()
     
     override init(frame: CGRect) {
@@ -45,7 +34,6 @@ class TopCollectionViewCell: UICollectionViewCell {
     
     private func setupUI() {
         contentView.addSubview(imageView)
-        contentView.addSubview(numberLabel)
         contentView.addSubview(activityIndicator)
         
         NSLayoutConstraint.activate([
@@ -54,24 +42,19 @@ class TopCollectionViewCell: UICollectionViewCell {
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
-            numberLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: -15),
-            numberLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 42),
-            
             activityIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }
     
-    func configure(with movie: Movie, index: Int) {
+    func configure(with image: Image) {
         Task {
-            activityIndicator.startAnimating()
-            numberLabel.text = "\(index + 1)"
-            imageView.image = try? await ImageService.shared.downloadImage(url: movie.poster.image)
+            imageView.image = try? await ImageService.shared.downloadImage(url: image.image)
             activityIndicator.stopAnimating()
         }
     }
 }
 
-extension TopCollectionViewCell {
-    static let reusableIdentifier = "TopCollectionViewCell"
+extension ImagesCollectionViewCell {
+    static let reuseIdentifier = "ImagesCollectionViewCell"
 }
