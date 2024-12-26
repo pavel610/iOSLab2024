@@ -19,6 +19,14 @@ class MainView: UIView {
         return activityIndicator
     }()
     
+    lazy var listActivityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .medium)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.isHidden = true
+        return activityIndicator
+    }()
+    
     lazy var topCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -46,7 +54,7 @@ class MainView: UIView {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.showsVerticalScrollIndicator = true
         collectionView.isScrollEnabled = false
-        
+                
         return collectionView 
     }()
     
@@ -64,7 +72,15 @@ class MainView: UIView {
         view.addSubview(topCollectionView)
         view.addSubview(customSegmentedControl)
         view.addSubview(listCollectionView)
+        view.addSubview(nextButton)
         return view
+    }()
+    
+    lazy var nextButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Next", for: .normal)
+        return button
     }()
 
     override init(frame: CGRect) {
@@ -81,6 +97,7 @@ class MainView: UIView {
         addSubview(searchView)
         addSubview(scrollView)
         addSubview(activityIndicator)
+        addSubview(listActivityIndicator)
         
         searchView.translatesAutoresizingMaskIntoConstraints = false
         customSegmentedControl.translatesAutoresizingMaskIntoConstraints = false
@@ -115,13 +132,18 @@ class MainView: UIView {
             listCollectionView.topAnchor.constraint(equalTo: customSegmentedControl.bottomAnchor, constant: 25),
             listCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             listCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            listCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            
+            nextButton.topAnchor.constraint(equalTo: listCollectionView.bottomAnchor, constant: 10),
+            nextButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            nextButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
             activityIndicator.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor)
+            activityIndicator.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor),
+            
+            listActivityIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            listActivityIndicator.topAnchor.constraint(equalTo: listCollectionView.bottomAnchor, constant: 10)
         ])
     }
-    
     
     //MARK: public funcs
     func reloadTopCollectionView() {
@@ -134,5 +156,16 @@ class MainView: UIView {
     
     func reloadListCollectionView() {
         listCollectionView.reloadData()
+    }
+    
+    func startUpdatingAllMovies() {
+        listCollectionView.isHidden = true
+        listActivityIndicator.isHidden = false
+        listActivityIndicator.startAnimating()
+    }
+    
+    func finishUpdatingAllMovies() {
+        listActivityIndicator.stopAnimating()
+        listCollectionView.isHidden = false
     }
 }

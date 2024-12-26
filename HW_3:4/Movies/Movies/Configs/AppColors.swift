@@ -13,4 +13,5 @@ enum AppColors {
     static let searchGray = UIColor.searchGray
     static let titleGray = UIColor.titleGray
     static let descriptionColor = UIColor(named: "DescriptionColor")
+    static let ratingColor = UIColor.rating
 }

@@ -35,4 +35,12 @@ class AllMoviesDataSource: NSObject, DataSourceProtocol {
     func getItems() -> [Movie] {
         allMovies
     }
+    
+    func addItems(_ items: [Movie]) {
+        allMovies += items
+    }
+    
+    func removeAll() {
+        allMovies.removeAll()
+    }
 }

@@ -38,4 +38,8 @@ class ImagesDataSource: NSObject, DataSourceProtocol {
     func getItems() -> [Image] {
         dataSource
     }
+    
+    func removeAll() {
+        dataSource.removeAll()
+    }
 }

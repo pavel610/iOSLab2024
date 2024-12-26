@@ -8,10 +8,9 @@ import UIKit
 
 class DataManager {
     static let shared = DataManager()
-    
-    private init() {
+    private var nextUrl: String?
 
-    }
+    private init() {}
     
     func obtainTopMovies() async throws -> [Movie]{
         let urlString = "https://kudago.com/public-api/v1.4/movies/?page_size=10&order_by=budget"
@@ -38,8 +37,18 @@ class DataManager {
         
         guard let url = URL(string: urlString) else { return []}
         let responseData = try await URLSession.shared.data(from: url)
-        let movies = try JSONDecoder().decode(MainResponse.self, from: responseData.0).results
-        return movies
+        let response = try JSONDecoder().decode(MainResponse.self, from: responseData.0)
+        nextUrl = response.next
+        return response.results
+    }
+    
+    func obtainNextPageAllMovies() async throws -> [Movie]{
+        guard let urlString = nextUrl, let url = URL(string: urlString) else { return []}
+        
+        let responseData = try await URLSession.shared.data(from: url)
+        let response = try JSONDecoder().decode(MainResponse.self, from: responseData.0)
+        nextUrl = response.next
+        return response.results
     }
     
     func obtainDetailInfoById(id: Int) async throws -> Movie? {

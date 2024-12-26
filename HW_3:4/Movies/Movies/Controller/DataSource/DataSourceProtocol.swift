@@ -10,4 +10,5 @@ protocol DataSourceProtocol: UICollectionViewDataSource {
     associatedtype ItemType
     func getItemByIndex(_ index: Int) -> ItemType
     func getItems() -> [ItemType]
+    func removeAll()
 }

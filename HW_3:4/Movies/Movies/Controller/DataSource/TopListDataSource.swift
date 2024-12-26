@@ -36,4 +36,8 @@ class TopListDataSource: NSObject, DataSourceProtocol {
     func getItems() -> [Movie] {
         dataSource
     }
+    
+    func removeAll() {
+        dataSource.removeAll()
+    }
 }

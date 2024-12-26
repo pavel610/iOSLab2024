@@ -8,8 +8,15 @@
 import UIKit
 
 class SearchView: UIView {
+    lazy var searchIcon: UIImageView = {
+        let searchIcon = UIImageView(image: UIImage.searchView.withRenderingMode(.alwaysTemplate))
+        searchIcon.tintColor = .gray
+        searchIcon.contentMode = .scaleAspectFit
+        searchIcon.frame = CGRect(x: 10, y: 0, width: 20, height: 20)
+        return searchIcon
+    }()
     
-    private let searchTextField: UITextField = {
+    private lazy var searchTextField: UITextField = {
         let textField = UITextField()
         textField.font = UIFont.systemFont(ofSize: 16)
         textField.textColor = .white
@@ -22,10 +29,7 @@ class SearchView: UIView {
         )
         
         // Добавление иконки справа
-        let searchIcon = UIImageView(image: UIImage.searchView.withRenderingMode(.alwaysTemplate))
-        searchIcon.tintColor = .gray
-        searchIcon.contentMode = .scaleAspectFit
-        searchIcon.frame = CGRect(x: 10, y: 0, width: 20, height: 20)
+        
         
         let iconContainer = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 20))
         iconContainer.addSubview(searchIcon)

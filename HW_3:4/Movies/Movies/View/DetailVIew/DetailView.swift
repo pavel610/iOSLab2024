@@ -8,19 +8,19 @@
 import UIKit
 
 class DetailView: UIView {
-    let imagesCollectionView: ImagesCollectionView = {
+    lazy var imagesCollectionView: ImagesCollectionView = {
         let imagesCollectionView = ImagesCollectionView()
         imagesCollectionView.translatesAutoresizingMaskIntoConstraints = false
         return imagesCollectionView
     }()
     
-    let segmentedControl: CustomSegmentedControl<String> = {
+    lazy var segmentedControl: CustomSegmentedControl<String> = {
         let segmentedControl = CustomSegmentedControl<String>(items: ["О фильме", "Каст", "Трейлер"], titleProvider: { $0 })
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
         return segmentedControl
     }()
     
-    let descriptionView: DescriptionView = {
+    private lazy var descriptionView: DescriptionView = {
         let descriptionView = DescriptionView()
         descriptionView.translatesAutoresizingMaskIntoConstraints = false
         return descriptionView
@@ -42,10 +42,14 @@ class DetailView: UIView {
         view.addSubview(titleLabel)
         view.addSubview(descriptionView)
         view.addSubview(segmentedControl)
+        view.addSubview(descriptionLabel)
+        view.addSubview(starsLabel)
+        view.addSubview(safariVideoView)
+        view.addSubview(ratingView)
         return view
     }()
     
-    lazy var posterImageView: UIImageView = {
+    private lazy var posterImageView: UIImageView = {
         let imageView = UIImageView(image: .example)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 16
@@ -54,7 +58,7 @@ class DetailView: UIView {
         return imageView
     }()
     
-    lazy var titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 20, weight: .bold)
@@ -62,11 +66,88 @@ class DetailView: UIView {
         label.textColor = .white
         return label
     }()
+    
+    private lazy var descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = .white
+        label.numberOfLines = 0
+        return label
+    }()
+    
+    private lazy var starsLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
+        label.textColor = .white
+        label.isHidden = true
+        return label
+    }()
+    
+    private lazy var safariVideoView: SafariVideoView = {
+        let safariVideoView = SafariVideoView()
+        safariVideoView.translatesAutoresizingMaskIntoConstraints = false
+        safariVideoView.isHidden = true
+        return safariVideoView
+    }()
+    
+    private lazy var ratingImageView: UIImageView = {
+        let imageView = UIImageView(image: .star)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
+    private lazy var ratingLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = AppColors.ratingColor
+        return label
+    }()
+    
+    private lazy var ratingView: UIView = {
+        let stack = UIStackView(arrangedSubviews: [ratingImageView,  ratingLabel])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .horizontal
+        stack.backgroundColor = .white
+        stack.spacing = 3
+        
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.widthAnchor.constraint(equalToConstant: 54).isActive = true
+        view.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        view.backgroundColor = .white
+        view.addSubview(stack)
+        
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: view.topAnchor, constant: 4),
+            stack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -4),
+            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
+            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+        ])
+        
+        return stack
+    }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = AppColors.mainColor
         setupUI()
+        segmentedControl.onSegmentSelected = {[weak self] selection in
+            guard let self = self else { return }
+            descriptionLabel.isHidden = true
+            starsLabel.isHidden = true
+            switch selection {
+            case "О фильме":
+                descriptionLabel.isHidden = false
+            case "Каст":
+                starsLabel.isHidden = false
+            case "Трейлер":
+                safariVideoView.openVideo()
+            default:
+                break
+            }
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -75,7 +156,7 @@ class DetailView: UIView {
     
     private func setupUI() {
         addSubview(scrollView)
-        addSubview(contentView)
+        scrollView.addSubview(contentView)
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 5),
@@ -94,6 +175,9 @@ class DetailView: UIView {
             imagesCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             imagesCollectionView.heightAnchor.constraint(equalToConstant: 210),
             
+            ratingView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
+            ratingView.bottomAnchor.constraint(equalTo: imagesCollectionView.bottomAnchor, constant: -5),
+            
             posterImageView.widthAnchor.constraint(equalToConstant: 95),
             posterImageView.heightAnchor.constraint(equalToConstant: 120),
             posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 25),
@@ -111,6 +195,21 @@ class DetailView: UIView {
             segmentedControl.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 25),
             segmentedControl.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -25),
             segmentedControl.heightAnchor.constraint(equalToConstant: 40),
+            
+            descriptionLabel.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 10),
+            descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 25),
+            descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -25),
+            descriptionLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor),
+            
+            starsLabel.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 10),
+            starsLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 25),
+            starsLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -25),
+            starsLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor),
+            
+            safariVideoView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 30),
+            safariVideoView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 25),
+            safariVideoView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -25),
+            safariVideoView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor),
         ])
     }
     
@@ -118,8 +217,34 @@ class DetailView: UIView {
         guard let movie = movie else { return }
         descriptionView.configure(with: movie)
         titleLabel.text = movie.title
+        descriptionLabel.text = parseHTML(movie.description ?? "")
+        starsLabel.text = movie.stars ?? "-"
+        safariVideoView.videoURLString = movie.trailerUrl ?? ""
+        ratingLabel.text = String(describing: movie.rating ?? 0.0)
         Task {
             posterImageView.image = try await ImageService.shared.downloadImage(url: movie.poster.image)
+        }
+    }
+    
+    //MARK: helping funcs
+    
+    //убирает теги html и парсит в обычную строку
+    func parseHTML(_ html: String) -> String {
+        guard let data = html.data(using: .utf8) else {
+            return ""
+        }
+        
+        do {
+            let attributedString = try NSAttributedString(
+                data: data,
+                options: [.documentType: NSAttributedString.DocumentType.html,
+                          .characterEncoding: String.Encoding.utf8.rawValue],
+                documentAttributes: nil
+            )
+            return attributedString.string
+        } catch {
+            print("Ошибка при парсинге HTML: \(error)")
+            return ""
         }
     }
 }

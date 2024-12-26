@@ -16,8 +16,9 @@ struct Movie: Codable {
     let poster: Image
     let images: [Image]?
     let genres: [Genre]?
+    let rating: Double?
     
     enum CodingKeys: String, CodingKey {
-        case id, title, poster, description = "body_text", yearOfPublication = "year", trailerUrl = "trailer", stars, runningTime = "running_time", images, genres
+        case id, title, poster, description = "body_text", yearOfPublication = "year", trailerUrl = "trailer", stars, runningTime = "running_time", images, genres, rating = "imdb_rating"
     }
 }
