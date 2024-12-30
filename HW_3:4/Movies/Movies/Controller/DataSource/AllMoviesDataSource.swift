@@ -6,7 +6,7 @@
 //
 import UIKit
 
-class AllMoviesDataSource: NSObject, DataSourceProtocol {
+class AllMoviesDataSource: NSObject, CollectionDataSourceProtocol {
     
     private var allMovies: [Movie] = []
     
@@ -23,7 +23,7 @@ class AllMoviesDataSource: NSObject, DataSourceProtocol {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ListCollectionViewCell.reusableIdentifier, for: indexPath) as? ListCollectionViewCell else {return UICollectionViewCell()}
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ListCollectionViewCell.reuseIdentifier, for: indexPath) as? ListCollectionViewCell else {return UICollectionViewCell()}
         cell.configure(with: allMovies[indexPath.item])
         return cell
     }

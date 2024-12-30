@@ -63,6 +63,7 @@ class TopCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(with movie: Movie, index: Int) {
+        imageView.image = nil
         Task {
             activityIndicator.startAnimating()
             numberLabel.text = "\(index + 1)"
@@ -73,5 +74,5 @@ class TopCollectionViewCell: UICollectionViewCell {
 }
 
 extension TopCollectionViewCell {
-    static let reusableIdentifier = "TopCollectionViewCell"
+    static let reuseIdentifier = "TopCollectionViewCell"
 }

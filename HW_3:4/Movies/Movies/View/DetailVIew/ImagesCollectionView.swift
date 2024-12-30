@@ -57,7 +57,7 @@ class ImagesCollectionView: UIView {
             return pagersStack
         }()
         
-        let countItems = (imagesCollectionView.dataSource as! (any DataSourceProtocol)).getItems().count
+        let countItems = (imagesCollectionView.dataSource as! (any CollectionDataSourceProtocol)).getItems().count
     
         for tag in 1...countItems {
             let pager = UIView()

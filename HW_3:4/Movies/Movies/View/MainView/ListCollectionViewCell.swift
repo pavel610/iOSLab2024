@@ -50,6 +50,7 @@ class ListCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(with movie: Movie) {
+        imageView.image = nil
         Task {
             imageView.image = try? await ImageService.shared.downloadImage(url: movie.poster.image)
             activityIndicator.stopAnimating()
@@ -58,5 +59,5 @@ class ListCollectionViewCell: UICollectionViewCell {
 }
 
 extension ListCollectionViewCell {
-    static let reusableIdentifier = "ListCollectionViewCell"
+    static let reuseIdentifier = "ListCollectionViewCell"
 }

@@ -34,7 +34,7 @@ class MainView: UIView {
         layout.itemSize = CGSize(width: 145, height: 210)
 
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(TopCollectionViewCell.self, forCellWithReuseIdentifier: TopCollectionViewCell.reusableIdentifier)
+        collectionView.register(TopCollectionViewCell.self, forCellWithReuseIdentifier: TopCollectionViewCell.reuseIdentifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = AppColors.mainColor
         collectionView.showsHorizontalScrollIndicator = false
@@ -48,7 +48,7 @@ class MainView: UIView {
         layout.itemSize = CGSize(width: 100, height: 145)
 
         let collectionView = DynamicHeightCollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(ListCollectionViewCell.self, forCellWithReuseIdentifier: ListCollectionViewCell.reusableIdentifier)
+        collectionView.register(ListCollectionViewCell.self, forCellWithReuseIdentifier: ListCollectionViewCell.reuseIdentifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = AppColors.mainColor
         collectionView.showsHorizontalScrollIndicator = false
@@ -80,6 +80,7 @@ class MainView: UIView {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Next", for: .normal)
+        button.isHidden = true
         return button
     }()
 
@@ -141,7 +142,7 @@ class MainView: UIView {
             activityIndicator.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor),
             
             listActivityIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            listActivityIndicator.topAnchor.constraint(equalTo: listCollectionView.bottomAnchor, constant: 10)
+            listActivityIndicator.topAnchor.constraint(equalTo: listCollectionView.topAnchor, constant: 10)
         ])
     }
     
@@ -156,16 +157,19 @@ class MainView: UIView {
     
     func reloadListCollectionView() {
         listCollectionView.reloadData()
+        nextButton.isHidden = false
     }
     
     func startUpdatingAllMovies() {
         listCollectionView.isHidden = true
         listActivityIndicator.isHidden = false
+        nextButton.isHidden = true
         listActivityIndicator.startAnimating()
     }
     
     func finishUpdatingAllMovies() {
         listActivityIndicator.stopAnimating()
+        nextButton.isHidden = false
         listCollectionView.isHidden = false
     }
 }

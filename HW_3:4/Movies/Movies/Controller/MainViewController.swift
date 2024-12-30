@@ -40,6 +40,7 @@ class MainViewController: UIViewController {
         mainView.listCollectionView.delegate = self
         mainView.listCollectionView.dataSource = allMoviesDataSource
         mainView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchDown)
+        mainView.searchView.iconContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(findMovieByName)))
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: navigationTitleLabel)
     }
 
@@ -87,12 +88,18 @@ class MainViewController: UIViewController {
         }
     }
     
-    @objc private func findMovieByName(_ name: String){
+    @objc private func findMovieByName(){
+        let name = mainView.searchView.getText()
+        guard !name.isEmpty else { return }
+        
         let allItems = allMoviesDataSource.getItems() + topListDataSource.getItems()
         if let movie = allItems.first(where: {$0.title.lowercased() == name.lowercased()}) {
-            let detailViewController = DetailViewController()
-            detailViewController.configure(with: movie)
-            navigationController?.pushViewController(detailViewController, animated: true)
+            Task {
+                let detailMovie = try await dataManager.obtainDetailInfoById(id: movie.id)
+                let detailViewController = DetailViewController()
+                detailViewController.configure(with: detailMovie)
+                navigationController?.pushViewController(detailViewController, animated: true)
+            }
         } else {
             let alert = UIAlertController(title: "", message: "Фильма с таким названием не найдено", preferredStyle: .alert)
             let ok = UIAlertAction(title: "OK", style: .default, handler: { (action) -> Void in
@@ -119,7 +126,7 @@ class MainViewController: UIViewController {
 extension MainViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.cellForItem(at: indexPath),
-              let dataSource = collectionView.dataSource as? (any DataSourceProtocol) else { return }
+              let dataSource = collectionView.dataSource as? (any CollectionDataSourceProtocol) else { return }
         
         UIView.animate(withDuration: 0.1,
                        animations: {

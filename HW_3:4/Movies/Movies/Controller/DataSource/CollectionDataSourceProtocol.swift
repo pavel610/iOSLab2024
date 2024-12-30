@@ -6,7 +6,7 @@
 //
 import UIKit
 
-protocol DataSourceProtocol: UICollectionViewDataSource {
+protocol CollectionDataSourceProtocol: UICollectionViewDataSource {
     associatedtype ItemType
     func getItemByIndex(_ index: Int) -> ItemType
     func getItems() -> [ItemType]

@@ -6,7 +6,7 @@
 //
 import UIKit
 
-class ImagesDataSource: NSObject, DataSourceProtocol {
+class ImagesDataSource: NSObject, CollectionDataSourceProtocol {
     typealias ItemType = Image
     
     private var dataSource: [Image]

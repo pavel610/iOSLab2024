@@ -38,4 +38,54 @@ class CoreDataManager {
             }
         }
     }
+    
+    func saveSavedMovie(movie: Movie) {
+        _ = movie.toSavedMovieEntity(context: viewContext)
+        saveContext()
+    }
+    
+    func fetchSavedMovies() -> [Movie] {
+        let request = SavedMovieEntity.fetchRequest()
+        do {
+            let entities = try viewContext.fetch(request)
+            return entities.compactMap{$0.toMovie()}
+        } catch {
+            print("Failed to fetch saved movies")
+            return []
+        }
+    }
+    
+    func isSaved(movieID: Int) -> Bool {
+        let request = SavedMovieEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %d", movieID)
+        do {
+            let count = try viewContext.count(for: request)
+            return count > 0
+        } catch {
+            print("Failed to check saved status: \(error)")
+            return false
+        }
+    }
+    
+    func removeFromFavorites(movieID: Int) {
+        let request = SavedMovieEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %d", movieID)
+        do {
+            let results = try viewContext.fetch(request)
+            for entity in results {
+                viewContext.delete(entity)
+            }
+            saveContext()
+        } catch {
+            print("Failed to remove from favorites: \(error)")
+        }
+    }
+
+    func createPreparedFetchResultsController() -> NSFetchedResultsController<SavedMovieEntity> {
+        let savedMovieRequest = SavedMovieEntity.fetchRequest()
+        savedMovieRequest.sortDescriptors = [NSSortDescriptor(key: "date_added", ascending: true)]
+        
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: savedMovieRequest, managedObjectContext: viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        return fetchedResultsController
+    }
 }

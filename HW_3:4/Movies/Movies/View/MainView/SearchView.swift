@@ -16,6 +16,12 @@ class SearchView: UIView {
         return searchIcon
     }()
     
+    lazy var iconContainer: UIView = {
+        let iconContainer = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 20))
+        iconContainer.addSubview(searchIcon)
+        return iconContainer
+    }()
+
     private lazy var searchTextField: UITextField = {
         let textField = UITextField()
         textField.font = UIFont.systemFont(ofSize: 16)
@@ -28,14 +34,8 @@ class SearchView: UIView {
             attributes: [NSAttributedString.Key.foregroundColor: AppColors.titleGray]
         )
         
-        // Добавление иконки справа
-        
-        
-        let iconContainer = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 20))
-        iconContainer.addSubview(searchIcon)
         textField.rightView = iconContainer
         textField.rightViewMode = .always
-        
         // Добавление отступов
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 20))
         textField.leftViewMode = .always
@@ -62,5 +62,9 @@ class SearchView: UIView {
             searchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             searchTextField.trailingAnchor.constraint(equalTo: self.trailingAnchor)
         ])
+    }
+    
+    func getText() -> String {
+        searchTextField.text ?? ""
     }
 }

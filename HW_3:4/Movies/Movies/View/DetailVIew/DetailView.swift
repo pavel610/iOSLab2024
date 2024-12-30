@@ -91,42 +91,10 @@ class DetailView: UIView {
         return safariVideoView
     }()
     
-    private lazy var ratingImageView: UIImageView = {
-        let imageView = UIImageView(image: .star)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
-    
-    private lazy var ratingLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = AppColors.ratingColor
-        return label
-    }()
-    
-    private lazy var ratingView: UIView = {
-        let stack = UIStackView(arrangedSubviews: [ratingImageView,  ratingLabel])
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.axis = .horizontal
-        stack.backgroundColor = .white
-        stack.spacing = 3
-        
-        let view = UIView()
+    private lazy var ratingView: RatingView = {
+        let view = RatingView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.widthAnchor.constraint(equalToConstant: 54).isActive = true
-        view.heightAnchor.constraint(equalToConstant: 24).isActive = true
-        view.backgroundColor = .white
-        view.addSubview(stack)
-        
-        NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: view.topAnchor, constant: 4),
-            stack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -4),
-            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
-            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
-        ])
-        
-        return stack
+        return view
     }()
 
     override init(frame: CGRect) {
@@ -220,7 +188,7 @@ class DetailView: UIView {
         descriptionLabel.text = parseHTML(movie.description ?? "")
         starsLabel.text = movie.stars ?? "-"
         safariVideoView.videoURLString = movie.trailerUrl ?? ""
-        ratingLabel.text = String(describing: movie.rating ?? 0.0)
+        ratingView.configure(rating: movie.rating)
         Task {
             posterImageView.image = try await ImageService.shared.downloadImage(url: movie.poster.image)
         }

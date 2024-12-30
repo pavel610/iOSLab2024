@@ -1,12 +1,13 @@
 //
-//  TopListDataSource.swift
+//  WatchListDataSource.swift
 //  Movies
 //
-//  Created by Павел Калинин on 22.12.2024.
+//  Created by Павел Калинин on 28.12.2024.
 //
 import UIKit
 
-class TopListDataSource: NSObject, CollectionDataSourceProtocol {
+class WatchListDataSource: NSObject, CollectionDataSourceProtocol {
+
     private var dataSource: [Movie]
     
     init(movies: [Movie]) {
@@ -18,14 +19,14 @@ class TopListDataSource: NSObject, CollectionDataSourceProtocol {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.count
+        dataSource.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TopCollectionViewCell.reuseIdentifier, for: indexPath) as? TopCollectionViewCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WatchListCollectionViewCell.reuseIdentifier, for: indexPath) as? WatchListCollectionViewCell else {
             return UICollectionViewCell()
         }
-        cell.configure(with: dataSource[indexPath.item], index: indexPath.item)
+        cell.configure(with: dataSource[indexPath.item])
         return cell
     }
     

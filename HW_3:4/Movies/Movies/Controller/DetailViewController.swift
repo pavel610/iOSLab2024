@@ -11,7 +11,6 @@ class DetailViewController: UIViewController {
     let detailView = DetailView()
     let imagesDataSource = ImagesDataSource(images: [])
     var movie: Movie?
-    var isMovieSaved = false
     
     lazy var rigthView: UIImageView = {
         let imageView = UIImageView()
@@ -49,13 +48,24 @@ class DetailViewController: UIViewController {
         detailView.configure(with: movie)
         imagesDataSource.updateDataSource(movie.images ?? [])
         detailView.imagesCollectionView.reloadCollectionView()
+        
+        let isMovieSaved = CoreDataManager.shared.isSaved(movieID: movie.id)
+        rigthView.image = isMovieSaved ? .bookmarkFilled : .bookmark
     }
     
     //MARK: objc methods
     @objc func saveButtonTapped() {
-        isMovieSaved.toggle()
+        guard let movie = movie else { return }
+        let isMovieSaved = CoreDataManager.shared.isSaved(movieID: movie.id)
+        
+        if isMovieSaved {
+            CoreDataManager.shared.removeFromFavorites(movieID: movie.id)
+        } else {
+            CoreDataManager.shared.saveSavedMovie(movie: movie)
+        }
+        
         UIView.animate(withDuration: 0.3) {
-            self.rigthView.image = self.isMovieSaved ? .bookmarkFilled : .bookmark
+            self.rigthView.image = !isMovieSaved ? .bookmarkFilled : .bookmark
         }
     }
 }

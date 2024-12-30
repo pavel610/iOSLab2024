@@ -1,17 +1,39 @@
 //
-//  DescriptionView.swift
+//  WatchListTableViewCell.swift
 //  Movies
 //
-//  Created by Павел Калинин on 25.12.2024.
+//  Created by Павел Калинин on 28.12.2024.
 //
 
 import UIKit
 
-class DescriptionView: UIView {
+class WatchListCollectionViewCell: UICollectionViewCell {
+    
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
+        label.textColor = .white
+        label.text = "Spider-Man: No Way Home Home Home"
+        return label
+    }()
+    
+    lazy var posterImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = 16
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
+    
     private lazy var yearLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textColor = AppColors.descriptionColor
+        label.text = "2021"
         return label
     }()
     
@@ -27,6 +49,7 @@ class DescriptionView: UIView {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textColor = AppColors.descriptionColor
+        label.text = "100"
         return label
     }()
     
@@ -43,6 +66,7 @@ class DescriptionView: UIView {
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textColor = AppColors.descriptionColor
         label.numberOfLines = 0
+        label.text = "action"
         return label
     }()
     
@@ -54,34 +78,30 @@ class DescriptionView: UIView {
         return imageView
     }()
     
-    private lazy var separator1: UIView = {
-        let view = UIView()
-        view.backgroundColor = AppColors.descriptionColor
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.widthAnchor.constraint(equalToConstant: 1).isActive = true
-        view.heightAnchor.constraint(equalToConstant: 16).isActive = true
-        return view
+    private lazy var ratingIcon: UIImageView = {
+        let imageView = UIImageView(image: .star)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        return imageView
     }()
     
-    private lazy var separator2: UIView = {
-        let view = UIView()
-        view.backgroundColor = AppColors.descriptionColor
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.widthAnchor.constraint(equalToConstant: 1).isActive = true
-        view.heightAnchor.constraint(equalToConstant: 16).isActive = true
-        return view
+    private lazy var ratingLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = AppColors.ratingColor
+        return label
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupView()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupView() {
+    private func setupUI() {
         let yearStack = UIStackView(arrangedSubviews: [yearIcon, yearLabel])
         yearStack.axis = .horizontal
         yearStack.spacing = 4
@@ -94,19 +114,33 @@ class DescriptionView: UIView {
         genreStack.axis = .horizontal
         genreStack.spacing = 4
         
-        let mainStack = UIStackView(arrangedSubviews: [yearStack, separator1, durationStack, separator2, genreStack])
-        mainStack.axis = .horizontal
-        mainStack.spacing = 8
-        mainStack.alignment = .center
+        let ratingStack = UIStackView(arrangedSubviews: [ratingIcon, ratingLabel])
+        ratingStack.axis = .horizontal
+        ratingStack.spacing = 4
         
-        addSubview(mainStack)
+        let mainStack = UIStackView(arrangedSubviews: [ratingStack, genreStack, yearStack, durationStack])
+        mainStack.axis = .vertical
+        mainStack.spacing = 4
+        mainStack.alignment = .leading
         mainStack.translatesAutoresizingMaskIntoConstraints = false
         
+        addSubview(posterImageView)
+        addSubview(mainStack)
+        addSubview(titleLabel)
+        
         NSLayoutConstraint.activate([
-            mainStack.topAnchor.constraint(equalTo: topAnchor),
-            mainStack.bottomAnchor.constraint(equalTo: bottomAnchor),
-            mainStack.leadingAnchor.constraint(equalTo: leadingAnchor),
-            mainStack.trailingAnchor.constraint(equalTo: trailingAnchor)
+            posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            posterImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            posterImageView.widthAnchor.constraint(equalToConstant: 95),
+            posterImageView.heightAnchor.constraint(equalToConstant: 120),
+            
+            mainStack.leadingAnchor.constraint(equalTo: posterImageView.trailingAnchor, constant: 10),
+            mainStack.bottomAnchor.constraint(equalTo: posterImageView.bottomAnchor),
+            
+            titleLabel.leadingAnchor.constraint(equalTo: posterImageView.trailingAnchor, constant: 10),
+            titleLabel.topAnchor.constraint(equalTo: posterImageView.topAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
         ])
     }
     
@@ -139,8 +173,18 @@ class DescriptionView: UIView {
     }
     
     func configure(with movie: Movie) {
-        yearLabel.text = "\(String(describing: movie.yearOfPublication!))"
-        durationLabel.text = "\(minutesWord(for: movie.runningTime ?? 0))"
+        posterImageView.image = nil
+        titleLabel.text = movie.title
         genreLabel.text = genreList(genres: movie.genres ?? [])
+        yearLabel.text = String(describing: movie.yearOfPublication!)
+        durationLabel.text = minutesWord(for: movie.runningTime ?? 0)
+        ratingLabel.text = String(describing: movie.rating ?? 0.0)
+        Task {
+            posterImageView.image = try? await ImageService.shared.downloadImage(url: movie.poster.image)
+        }
     }
+}
+
+extension WatchListCollectionViewCell {
+    static let reuseIdentifier = "WatchListTableViewCell"
 }
