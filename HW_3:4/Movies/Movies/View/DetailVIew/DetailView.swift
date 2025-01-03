@@ -50,7 +50,7 @@ class DetailView: UIView {
     }()
     
     private lazy var posterImageView: UIImageView = {
-        let imageView = UIImageView(image: .example)
+        let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 16
         imageView.clipsToBounds = true

@@ -35,12 +35,17 @@ class MainViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         mainView.topCollectionView.delegate = self
         mainView.topCollectionView.dataSource = topListDataSource
+        
         mainView.listCollectionView.delegate = self
         mainView.listCollectionView.dataSource = allMoviesDataSource
-        mainView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchDown)
+        
+        mainView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+        
         mainView.searchView.iconContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(findMovieByName)))
+        mainView.searchView.searchTextField.delegate = self
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: navigationTitleLabel)
     }
 
@@ -53,7 +58,7 @@ class MainViewController: UIViewController {
             guard let self = self else { return }
             Task {
                 self.mainView.startUpdatingAllMovies()
-                let allMovies = try await self.dataManager.obtainAllMovies(in: self.mainView.customSegmentedControl.getCurrentValue())
+                let allMovies = try await self.dataManager.obtainInitialAllMovies(in: self.mainView.customSegmentedControl.getCurrentValue())
                 //Обновление коллекции при смене города
                 self.mainView.listCollectionView.performBatchUpdates({
                     let itemCount = self.allMoviesDataSource.getItems().count
@@ -78,7 +83,7 @@ class MainViewController: UIViewController {
             self.topListDataSource.updateMovies(movies)
             let cities = try await dataManager.obtainCities()
             mainView.customSegmentedControl.updateDataSource(with: cities)
-            let allMovies = try await dataManager.obtainAllMovies(in: mainView.customSegmentedControl.getCurrentValue())
+            let allMovies = try await dataManager.getInitialMovies(in: mainView.customSegmentedControl.getCurrentValue())
             allMoviesDataSource.updateDataSource(with: allMovies)
             
             mainView.activityIndicator.stopAnimating()
@@ -109,8 +114,15 @@ class MainViewController: UIViewController {
         }
     }
     
-    @objc private func nextButtonTapped() {
+    @objc private func nextButtonTapped(_ sender: UIButton) {
         Task {
+            UIView.animate(withDuration: 0.3) {
+                sender.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+            } completion: { _ in
+                UIView.animate(withDuration: 0.1) {
+                    sender.transform = .identity
+                }
+            }
             let movies = try await dataManager.obtainNextPageAllMovies()
             
             mainView.listCollectionView.performBatchUpdates {
@@ -121,6 +133,10 @@ class MainViewController: UIViewController {
             }
         }
     }
+    
+    @objc private func hideKeyboard(_ sender: UIView) {
+        sender.endEditing(true)
+    }
 }
 
 extension MainViewController: UICollectionViewDelegate {
@@ -128,15 +144,18 @@ extension MainViewController: UICollectionViewDelegate {
         guard let cell = collectionView.cellForItem(at: indexPath),
               let dataSource = collectionView.dataSource as? (any CollectionDataSourceProtocol) else { return }
         
-        UIView.animate(withDuration: 0.1,
-                       animations: {
+        let animator = UIViewPropertyAnimator(duration: 0.1, curve: .easeInOut) {
             cell.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-        },
-                       completion: { _ in
-            UIView.animate(withDuration: 0.1) {
-                cell.transform = CGAffineTransform.identity
+        }
+
+        animator.addCompletion { _ in
+            let returnAnimator = UIViewPropertyAnimator(duration: 0.1, curve: .easeInOut) {
+                cell.transform = .identity
             }
-        })
+            returnAnimator.startAnimation()
+        }
+
+        animator.startAnimation()
 
         Task {
             let movie = try await dataManager.obtainDetailInfoById(id: (dataSource.getItemByIndex(indexPath.item) as! Movie).id)
@@ -144,5 +163,13 @@ extension MainViewController: UICollectionViewDelegate {
             detailViewController.configure(with: movie)
             navigationController?.pushViewController(detailViewController, animated: true)
         }
+    }
+}
+
+extension MainViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        findMovieByName()
+        textField.resignFirstResponder()
+        return true
     }
 }

@@ -16,7 +16,7 @@ class WatchListCollectionViewCell: UICollectionViewCell {
         label.numberOfLines = 1
         label.lineBreakMode = .byTruncatingTail
         label.textColor = .white
-        label.text = "Spider-Man: No Way Home Home Home"
+        label.widthAnchor.constraint(equalToConstant: 250).isActive = true
         return label
     }()
     
@@ -65,8 +65,7 @@ class WatchListCollectionViewCell: UICollectionViewCell {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textColor = AppColors.descriptionColor
-        label.numberOfLines = 0
-        label.text = "action"
+        label.numberOfLines = 1
         return label
     }()
     
@@ -118,7 +117,7 @@ class WatchListCollectionViewCell: UICollectionViewCell {
         ratingStack.axis = .horizontal
         ratingStack.spacing = 4
         
-        let mainStack = UIStackView(arrangedSubviews: [ratingStack, genreStack, yearStack, durationStack])
+        let mainStack = UIStackView(arrangedSubviews: [titleLabel, ratingStack, genreStack, yearStack, durationStack])
         mainStack.axis = .vertical
         mainStack.spacing = 4
         mainStack.alignment = .leading
@@ -126,21 +125,16 @@ class WatchListCollectionViewCell: UICollectionViewCell {
         
         addSubview(posterImageView)
         addSubview(mainStack)
-        addSubview(titleLabel)
         
         NSLayoutConstraint.activate([
             posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            posterImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             posterImageView.widthAnchor.constraint(equalToConstant: 95),
             posterImageView.heightAnchor.constraint(equalToConstant: 120),
             
             mainStack.leadingAnchor.constraint(equalTo: posterImageView.trailingAnchor, constant: 10),
-            mainStack.bottomAnchor.constraint(equalTo: posterImageView.bottomAnchor),
-            
-            titleLabel.leadingAnchor.constraint(equalTo: posterImageView.trailingAnchor, constant: 10),
-            titleLabel.topAnchor.constraint(equalTo: posterImageView.topAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            mainStack.topAnchor.constraint(equalTo: contentView.topAnchor),
         ])
     }
     
@@ -163,13 +157,8 @@ class WatchListCollectionViewCell: UICollectionViewCell {
     }
     
     private func genreList(genres: [Genre]) -> String {
-        guard !genres.isEmpty else { return "-" }
-        var string = ""
-        for genre in genres {
-            string += "\(String(describing: genre.name)), "
-        }
-        string.removeLast(2)
-        return string
+        var string = "\(String(describing: genres[0].name))"
+        return genres.count > 1 ? string + " и др." : string
     }
     
     func configure(with movie: Movie) {

@@ -32,7 +32,6 @@ class CoreDataManager {
             do {
                 try context.save()
             } catch {
-
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
@@ -44,15 +43,23 @@ class CoreDataManager {
         saveContext()
     }
     
-    func fetchSavedMovies() -> [Movie] {
+    func fetchSavedMovies() throws -> [Movie] {
         let request = SavedMovieEntity.fetchRequest()
-        do {
-            let entities = try viewContext.fetch(request)
-            return entities.compactMap{$0.toMovie()}
-        } catch {
-            print("Failed to fetch saved movies")
-            return []
+        let entities = try viewContext.fetch(request)
+        return entities.compactMap{$0.toMovie()}
+    }
+    
+    func saveInitialMovies(movies: [Movie]) {
+        for movie in movies {
+            let _ = movie.toMovieEntity(context: viewContext)
+            saveContext()
         }
+    }
+    
+    func fetchIntialMovies() throws -> [Movie] {
+        let request = MovieEntity.fetchRequest()
+        let entities = try viewContext.fetch(request)
+        return entities.compactMap{$0.toMovie()}
     }
     
     func isSaved(movieID: Int) -> Bool {

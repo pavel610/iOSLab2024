@@ -32,7 +32,8 @@ class DataManager {
         return cities
     }
     
-    func obtainAllMovies(in city: City) async throws -> [Movie] {
+    //Запрашивает фильмы для первой страницы
+    func obtainInitialAllMovies(in city: City) async throws -> [Movie] {
         let urlString = "https://kudago.com/public-api/v1.4/movies/?page_size=21&location=\(city.slug)"
         
         guard let url = URL(string: urlString) else { return []}
@@ -42,6 +43,7 @@ class DataManager {
         return response.results
     }
     
+    //Запрашивает фильмы для следующей страницы
     func obtainNextPageAllMovies() async throws -> [Movie]{
         guard let urlString = nextUrl, let url = URL(string: urlString) else { return []}
         
@@ -58,5 +60,18 @@ class DataManager {
         let responseData = try await URLSession.shared.data(from: url)
         let movie = try JSONDecoder().decode(Movie.self, from: responseData.0)
         return movie
+    }
+    
+    func getInitialMovies(in city: City) async throws -> [Movie] {
+        if let moviesCoreData = try? CoreDataManager.shared.fetchIntialMovies(), !moviesCoreData.isEmpty {
+            return moviesCoreData
+        } else {
+            let initialMovies: [Movie] = try await DataManager.shared.obtainInitialAllMovies(in: city)
+            await withCheckedContinuation { continuation in
+                CoreDataManager.shared.saveInitialMovies(movies: initialMovies)
+                continuation.resume()
+            }
+            return initialMovies
+        }
     }
 }

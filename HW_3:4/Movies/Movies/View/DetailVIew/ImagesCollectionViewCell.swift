@@ -27,7 +27,6 @@ class ImagesCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         setupUI()
         layer.cornerRadius = 16
-        
     }
     
     required init?(coder: NSCoder) {

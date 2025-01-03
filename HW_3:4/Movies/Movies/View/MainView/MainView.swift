@@ -9,7 +9,12 @@ import UIKit
 
 class MainView: UIView {
     let searchView = SearchView()
-    let customSegmentedControl = CustomSegmentedControl<City>(items: [], titleProvider: {$0.name})
+    let customSegmentedControl: CustomSegmentedControl = {
+        let customSegmentedControl = CustomSegmentedControl<City>(items: [], titleProvider: {$0.name})
+        customSegmentedControl.collectionView.contentInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 10)
+        customSegmentedControl.translatesAutoresizingMaskIntoConstraints = false
+        return customSegmentedControl
+    }()
     
     lazy var activityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView(style: .medium)
@@ -38,7 +43,7 @@ class MainView: UIView {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = AppColors.mainColor
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 25, bottom: 0, right: 10)
         return collectionView
     }()
     
@@ -79,7 +84,7 @@ class MainView: UIView {
     lazy var nextButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Next", for: .normal)
+        button.setTitle("Дальше", for: .normal)
         button.isHidden = true
         return button
     }()
@@ -110,8 +115,8 @@ class MainView: UIView {
             searchView.heightAnchor.constraint(equalToConstant: 45),
             
             scrollView.topAnchor.constraint(equalTo: searchView.bottomAnchor, constant: 10),
-            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -60),
             
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
@@ -131,8 +136,8 @@ class MainView: UIView {
             customSegmentedControl.heightAnchor.constraint(equalToConstant: 40),
 
             listCollectionView.topAnchor.constraint(equalTo: customSegmentedControl.bottomAnchor, constant: 25),
-            listCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            listCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            listCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            listCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
             nextButton.topAnchor.constraint(equalTo: listCollectionView.bottomAnchor, constant: 10),
             nextButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -142,7 +147,7 @@ class MainView: UIView {
             activityIndicator.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor),
             
             listActivityIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            listActivityIndicator.topAnchor.constraint(equalTo: listCollectionView.topAnchor, constant: 10)
+            listActivityIndicator.topAnchor.constraint(equalTo: listCollectionView.topAnchor, constant: 10),
         ])
     }
     
@@ -171,5 +176,13 @@ class MainView: UIView {
         listActivityIndicator.stopAnimating()
         nextButton.isHidden = false
         listCollectionView.isHidden = false
+    }
+    
+    func startAddingAllMovies() {
+        nextButton.isHidden = true
+    }
+    
+    func finishAddingAllMovies() {
+        nextButton.isHidden = false
     }
 }

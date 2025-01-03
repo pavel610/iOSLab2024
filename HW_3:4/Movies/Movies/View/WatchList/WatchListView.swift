@@ -13,7 +13,9 @@ class WatchListView: UIView {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 15
-        layout.itemSize = CGSize(width: UIScreen.main.bounds.width - 64, height: 130)
+        layout.minimumInteritemSpacing = 0
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 25, bottom: 0, right: 25)
+        layout.itemSize = CGSize(width: UIScreen.main.bounds.width - 50, height: 120)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -38,8 +40,8 @@ class WatchListView: UIView {
         
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 5),
-            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32),
-            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 32),
+            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -60),
         ])
     }

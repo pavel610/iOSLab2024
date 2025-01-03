@@ -22,7 +22,7 @@ class SearchView: UIView {
         return iconContainer
     }()
 
-    private lazy var searchTextField: UITextField = {
+    lazy var searchTextField: UITextField = {
         let textField = UITextField()
         textField.font = UIFont.systemFont(ofSize: 16)
         textField.textColor = .white

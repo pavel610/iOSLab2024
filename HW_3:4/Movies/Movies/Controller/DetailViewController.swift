@@ -28,18 +28,25 @@ class DetailViewController: UIViewController {
         setupNavigationBar()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        if let movie = movie {
+            let isMovieSaved = CoreDataManager.shared.isSaved(movieID: movie.id)
+            rigthView.image = isMovieSaved ? .bookmarkFilled : .bookmark
+        }
+    }
+    
     override func loadView() {
         view = detailView
     }
     
     private func setupNavigationBar() {
         let navBar = navigationController!.navigationBar
-        let backButton = UIBarButtonItem()
-        backButton.title = ""
         navigationItem.title = "Подробно"
         navBar.tintColor = .white
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rigthView)
-        navigationItem.backBarButtonItem = backButton
+        
+        navigationItem.hidesBackButton = true
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: #selector(backButtonTapped))
     }
     
     func configure(with movie: Movie?) {
@@ -54,7 +61,7 @@ class DetailViewController: UIViewController {
     }
     
     //MARK: objc methods
-    @objc func saveButtonTapped() {
+    @objc private func saveButtonTapped() {
         guard let movie = movie else { return }
         let isMovieSaved = CoreDataManager.shared.isSaved(movieID: movie.id)
         
@@ -67,6 +74,10 @@ class DetailViewController: UIViewController {
         UIView.animate(withDuration: 0.3) {
             self.rigthView.image = !isMovieSaved ? .bookmarkFilled : .bookmark
         }
+    }
+    
+    @objc private func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
     }
 }
 
