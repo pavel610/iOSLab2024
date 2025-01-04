@@ -12,6 +12,16 @@ class DetailViewController: UIViewController {
     let imagesDataSource = ImagesDataSource(images: [])
     var movie: Movie?
     
+    var error: String? {
+        didSet {
+            if let error = error {
+                detailView.showErrorLabel(with: error)
+            } else {
+                detailView.hideErrorLabel()
+            }
+        }
+    }
+    
     lazy var rigthView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = .bookmark
@@ -24,7 +34,6 @@ class DetailViewController: UIViewController {
         super.viewDidLoad()
         detailView.imagesCollectionView.imagesCollectionView.delegate = self
         detailView.imagesCollectionView.imagesCollectionView.dataSource = imagesDataSource
-        detailView.imagesCollectionView.setupController()
         setupNavigationBar()
     }
     
@@ -53,8 +62,10 @@ class DetailViewController: UIViewController {
         guard let movie = movie else { return }
         self.movie = movie
         detailView.configure(with: movie)
+        detailView.stopLoadingMovie()
         imagesDataSource.updateDataSource(movie.images ?? [])
-        detailView.imagesCollectionView.reloadCollectionView()
+        detailView.reloadCollectionView()
+        detailView.imagesCollectionView.setupController()
         
         let isMovieSaved = CoreDataManager.shared.isSaved(movieID: movie.id)
         rigthView.image = isMovieSaved ? .bookmarkFilled : .bookmark

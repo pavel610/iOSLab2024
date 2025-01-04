@@ -12,8 +12,18 @@ class MainViewController: UIViewController {
     private let dataManager = DataManager.shared
     private let topListDataSource: TopListDataSource = TopListDataSource(movies: [])
     private let allMoviesDataSource = AllMoviesDataSource(allMovies: [])
+    
+    private var error: String? {
+        didSet {
+            if let error = error {
+                mainView.showErrorLabel(with: error)
+            } else {
+                mainView.hideErrorLabel()
+            }
+        }
+    }
         
-    lazy var navigationTitleLabel: UILabel = {
+    private lazy var navigationTitleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Что хотите посмотреть?"
@@ -23,18 +33,10 @@ class MainViewController: UIViewController {
         return label
     }()
     
-    init() {
-        super.init(nibName: nil, bundle: nil)
+    override func viewDidLoad() {
+        super.viewDidLoad()        
         loadData()
         setupSegmentControlAction()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
         
         mainView.topCollectionView.delegate = self
         mainView.topCollectionView.dataSource = topListDataSource
@@ -43,6 +45,7 @@ class MainViewController: UIViewController {
         mainView.listCollectionView.dataSource = allMoviesDataSource
         
         mainView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+        mainView.refreshButton.addTarget(self, action: #selector(loadData), for: .touchUpInside)
         
         mainView.searchView.iconContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(findMovieByName)))
         mainView.searchView.searchTextField.delegate = self
@@ -77,19 +80,23 @@ class MainViewController: UIViewController {
         }
     }
     
-    private func loadData() {
+    @objc private func loadData() {
         Task {
-            let movies = try await dataManager.obtainTopMovies()
-            self.topListDataSource.updateMovies(movies)
-            let cities = try await dataManager.obtainCities()
-            mainView.customSegmentedControl.updateDataSource(with: cities)
-            let allMovies = try await dataManager.getInitialMovies(in: mainView.customSegmentedControl.getCurrentValue())
-            allMoviesDataSource.updateDataSource(with: allMovies)
-            
-            mainView.activityIndicator.stopAnimating()
-            mainView.reloadCityCollectionView()
-            mainView.reloadTopCollectionView()
-            mainView.reloadListCollectionView()
+            do {
+                let movies = try await dataManager.obtainTopMovies()
+                self.topListDataSource.updateMovies(movies)
+                let cities = try await dataManager.obtainCities()
+                mainView.customSegmentedControl.updateDataSource(with: cities)
+                let allMovies = try await dataManager.getInitialMovies(in: mainView.customSegmentedControl.getCurrentValue())
+                allMoviesDataSource.updateDataSource(with: allMovies)
+                
+                mainView.stopLoadingPageAnimation()
+                mainView.reloadCityCollectionView()
+                mainView.reloadTopCollectionView()
+                mainView.reloadListCollectionView()
+            } catch {
+                self.error = error.localizedDescription
+            }
         }
     }
     
@@ -157,11 +164,15 @@ extension MainViewController: UICollectionViewDelegate {
 
         animator.startAnimation()
 
+        let detailViewController = DetailViewController()
+        navigationController?.pushViewController(detailViewController, animated: true)
         Task {
-            let movie = try await dataManager.obtainDetailInfoById(id: (dataSource.getItemByIndex(indexPath.item) as! Movie).id)
-            let detailViewController = DetailViewController()
-            detailViewController.configure(with: movie)
-            navigationController?.pushViewController(detailViewController, animated: true)
+            do {
+                let movie = try await dataManager.obtainDetailInfoById(id: (dataSource.getItemByIndex(indexPath.item) as! Movie).id)
+                detailViewController.configure(with: movie)
+            } catch {
+                detailViewController.error = error.localizedDescription
+            }
         }
     }
 }

@@ -49,23 +49,18 @@ class CustomSegmentCell: UICollectionViewCell {
 
         underlineView.isHidden = true
     }
-
-    func configure(with title: String, isSelected: Bool) {
-        titleLabel.text = title
-        titleLabel.font = isSelected ? .systemFont(ofSize: 18) : .systemFont(ofSize: 16)
-        
-        if isSelected {
-            underlineView.isHidden = false
-        } else {
-            underlineView.isHidden = true
-        }
-    }
-
+    
     func animateSelection(isSelected: Bool) {
         UIView.animate(.linear) {
             self.underlineView.isHidden = !isSelected
             self.titleLabel.font = isSelected ? .systemFont(ofSize: 18) : .systemFont(ofSize: 16)
         }
+    }
+
+    func configure(with title: String, isSelected: Bool) {
+        titleLabel.text = title
+        titleLabel.font = isSelected ? .systemFont(ofSize: 18) : .systemFont(ofSize: 16)
+        underlineView.isHidden = !isSelected
     }
 }
 

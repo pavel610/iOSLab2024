@@ -8,7 +8,7 @@
 import UIKit
 
 class SearchView: UIView {
-    lazy var searchIcon: UIImageView = {
+    private lazy var searchIcon: UIImageView = {
         let searchIcon = UIImageView(image: UIImage.searchView.withRenderingMode(.alwaysTemplate))
         searchIcon.tintColor = .gray
         searchIcon.contentMode = .scaleAspectFit
@@ -36,7 +36,6 @@ class SearchView: UIView {
         
         textField.rightView = iconContainer
         textField.rightViewMode = .always
-        // Добавление отступов
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 20))
         textField.leftViewMode = .always
         
@@ -52,6 +51,7 @@ class SearchView: UIView {
         super.init(coder: coder)
     }
     
+    //MARK: private methods
     private func setupView() {
         addSubview(searchTextField)
         
@@ -64,6 +64,7 @@ class SearchView: UIView {
         ])
     }
     
+    //MARK: public methods
     func getText() -> String {
         searchTextField.text ?? ""
     }

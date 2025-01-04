@@ -66,7 +66,7 @@ class DataManager {
         if let moviesCoreData = try? CoreDataManager.shared.fetchIntialMovies(), !moviesCoreData.isEmpty {
             return moviesCoreData
         } else {
-            let initialMovies: [Movie] = try await DataManager.shared.obtainInitialAllMovies(in: city)
+            let initialMovies: [Movie] = try await obtainInitialAllMovies(in: city)
             await withCheckedContinuation { continuation in
                 CoreDataManager.shared.saveInitialMovies(movies: initialMovies)
                 continuation.resume()

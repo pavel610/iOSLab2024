@@ -50,10 +50,8 @@ class CoreDataManager {
     }
     
     func saveInitialMovies(movies: [Movie]) {
-        for movie in movies {
-            let _ = movie.toMovieEntity(context: viewContext)
-            saveContext()
-        }
+        let _ = movies.compactMap{$0.toMovieEntity(context: viewContext)}
+        saveContext()
     }
     
     func fetchIntialMovies() throws -> [Movie] {

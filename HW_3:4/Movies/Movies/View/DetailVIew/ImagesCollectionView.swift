@@ -39,6 +39,7 @@ class ImagesCollectionView: UIView {
     
     private func setupCollection() {
         addSubview(imagesCollectionView)
+        
         NSLayoutConstraint.activate([
             imagesCollectionView.topAnchor.constraint(equalTo: topAnchor),
             imagesCollectionView.bottomAnchor.constraint(equalTo: bottomAnchor),
@@ -83,9 +84,5 @@ class ImagesCollectionView: UIView {
         if let index = sender.view?.tag {
             imagesCollectionView.scrollToItem(at: IndexPath(item: index - 1, section: 0), at: .centeredHorizontally, animated: true)
         }
-    }
-    
-    func reloadCollectionView() {
-        imagesCollectionView.reloadData()
     }
 }

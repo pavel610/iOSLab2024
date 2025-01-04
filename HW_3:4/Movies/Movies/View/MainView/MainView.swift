@@ -8,15 +8,34 @@
 import UIKit
 
 class MainView: UIView {
-    let searchView = SearchView()
-    let customSegmentedControl: CustomSegmentedControl = {
+    lazy var searchView = SearchView()
+    
+    lazy var customSegmentedControl: CustomSegmentedControl = {
         let customSegmentedControl = CustomSegmentedControl<City>(items: [], titleProvider: {$0.name})
         customSegmentedControl.collectionView.contentInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 10)
         customSegmentedControl.translatesAutoresizingMaskIntoConstraints = false
         return customSegmentedControl
     }()
     
-    lazy var activityIndicator: UIActivityIndicatorView = {
+    private lazy var errorLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = .white
+        label.numberOfLines = 0
+        label.isHidden = true
+        return label
+    }()
+    
+    lazy var refreshButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Обновить", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.isHidden = true
+        return button
+    }()
+    
+    private lazy var activityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView(style: .medium)
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         activityIndicator.hidesWhenStopped = true
@@ -24,7 +43,7 @@ class MainView: UIView {
         return activityIndicator
     }()
     
-    lazy var listActivityIndicator: UIActivityIndicatorView = {
+    private lazy var listActivityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView(style: .medium)
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         activityIndicator.hidesWhenStopped = true
@@ -104,6 +123,8 @@ class MainView: UIView {
         addSubview(scrollView)
         addSubview(activityIndicator)
         addSubview(listActivityIndicator)
+        addSubview(errorLabel)
+        addSubview(refreshButton)
         
         searchView.translatesAutoresizingMaskIntoConstraints = false
         customSegmentedControl.translatesAutoresizingMaskIntoConstraints = false
@@ -148,6 +169,12 @@ class MainView: UIView {
             
             listActivityIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             listActivityIndicator.topAnchor.constraint(equalTo: listCollectionView.topAnchor, constant: 10),
+            
+            errorLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            errorLabel.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor),
+            
+            refreshButton.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            refreshButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor, constant: 10),
         ])
     }
     
@@ -178,11 +205,22 @@ class MainView: UIView {
         listCollectionView.isHidden = false
     }
     
-    func startAddingAllMovies() {
-        nextButton.isHidden = true
+    func showErrorLabel(with error: String) {
+        errorLabel.isHidden = false
+        refreshButton.isHidden = false
+        activityIndicator.isHidden = true
+        errorLabel.text = error
     }
     
-    func finishAddingAllMovies() {
-        nextButton.isHidden = false
+    func hideErrorLabel() {
+        errorLabel.isHidden = true
+        refreshButton.isHidden = true
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+        errorLabel.text = nil
+    }
+    
+    func stopLoadingPageAnimation() {
+        activityIndicator.stopAnimating()
     }
 }

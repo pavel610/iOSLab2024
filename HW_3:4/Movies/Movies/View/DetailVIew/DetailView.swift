@@ -8,6 +8,15 @@
 import UIKit
 
 class DetailView: UIView {
+    private lazy var errorLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = .white
+        label.numberOfLines = 0
+        label.isHidden = true
+        return label
+    }()
+    
     lazy var imagesCollectionView: ImagesCollectionView = {
         let imagesCollectionView = ImagesCollectionView()
         imagesCollectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -32,6 +41,14 @@ class DetailView: UIView {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.addSubview(contentView)
         return scrollView
+    }()
+    
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .medium)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.startAnimating()
+        return activityIndicator
     }()
     
     private lazy var contentView: UIView = {
@@ -101,6 +118,7 @@ class DetailView: UIView {
         super.init(frame: frame)
         backgroundColor = AppColors.mainColor
         setupUI()
+        startLoadingMovie()
         segmentedControl.onSegmentSelected = {[weak self] selection in
             guard let self = self else { return }
             descriptionLabel.isHidden = true
@@ -124,6 +142,8 @@ class DetailView: UIView {
     
     private func setupUI() {
         addSubview(scrollView)
+        addSubview(activityIndicator)
+        addSubview(errorLabel)
         scrollView.addSubview(contentView)
         
         NSLayoutConstraint.activate([
@@ -178,9 +198,16 @@ class DetailView: UIView {
             safariVideoView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 25),
             safariVideoView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -25),
             safariVideoView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor),
+            
+            activityIndicator.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor),
+            
+            errorLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            errorLabel.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor),
         ])
     }
     
+    //MARK: public methods
     func configure(with movie: Movie?) {
         guard let movie = movie else { return }
         descriptionView.configure(with: movie)
@@ -190,14 +217,41 @@ class DetailView: UIView {
         safariVideoView.videoURLString = movie.trailerUrl ?? ""
         ratingView.configure(rating: movie.rating)
         Task {
-            posterImageView.image = try await ImageService.shared.downloadImage(url: movie.poster.image)
+            posterImageView.image = (try? await ImageService.shared.downloadImage(url: movie.poster.image)) ?? .default
         }
     }
     
-    //MARK: helping funcs
+    func reloadCollectionView() {
+        imagesCollectionView.imagesCollectionView.reloadData()
+    }
+    
+    func startLoadingMovie() {
+        scrollView.isHidden = true
+        activityIndicator.startAnimating()
+    }
+    
+    func stopLoadingMovie() {
+        scrollView.isHidden = false
+        activityIndicator.stopAnimating()
+    }
+    
+    func showErrorLabel(with error: String) {
+        errorLabel.isHidden = false
+        activityIndicator.isHidden = true
+        errorLabel.text = error
+    }
+    
+    func hideErrorLabel() {
+        errorLabel.isHidden = true
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+        errorLabel.text = nil
+    }
+    
+    //MARK: helping methods
     
     //убирает теги html и парсит в обычную строку
-    func parseHTML(_ html: String) -> String {
+    private func parseHTML(_ html: String) -> String {
         guard let data = html.data(using: .utf8) else {
             return ""
         }

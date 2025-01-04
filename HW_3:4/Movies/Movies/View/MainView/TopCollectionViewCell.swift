@@ -64,9 +64,9 @@ class TopCollectionViewCell: UICollectionViewCell {
     
     func configure(with movie: Movie, index: Int) {
         imageView.image = nil
+        activityIndicator.startAnimating()
+        numberLabel.text = "\(index + 1)"
         Task {
-            activityIndicator.startAnimating()
-            numberLabel.text = "\(index + 1)"
             imageView.image = try? await ImageService.shared.downloadImage(url: movie.poster.image)
             activityIndicator.stopAnimating()
         }

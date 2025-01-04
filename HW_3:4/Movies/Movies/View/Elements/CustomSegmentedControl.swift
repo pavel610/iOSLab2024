@@ -87,7 +87,7 @@ class CustomSegmentedControl<T>: UIView, UICollectionViewDataSource, UICollectio
         collectionView.reloadData()
     }
     
-    //MARK: methos UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
+    //MARK: methods UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return items.count
     }

@@ -157,7 +157,7 @@ class WatchListCollectionViewCell: UICollectionViewCell {
     }
     
     private func genreList(genres: [Genre]) -> String {
-        var string = "\(String(describing: genres[0].name))"
+        let string = "\(String(describing: genres[0].name))"
         return genres.count > 1 ? string + " и др." : string
     }
     
@@ -169,7 +169,7 @@ class WatchListCollectionViewCell: UICollectionViewCell {
         durationLabel.text = minutesWord(for: movie.runningTime ?? 0)
         ratingLabel.text = String(describing: movie.rating ?? 0.0)
         Task {
-            posterImageView.image = try? await ImageService.shared.downloadImage(url: movie.poster.image)
+            posterImageView.image = (try? await ImageService.shared.downloadImage(url: movie.poster.image)) ?? .default
         }
     }
 }
