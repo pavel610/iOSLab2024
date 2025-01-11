@@ -49,7 +49,7 @@ class CoreDataManager {
         return entities.compactMap{$0.toMovie()}
     }
     
-    func saveInitialMovies(movies: [Movie]) {
+    func saveMovieEntities(movies: [Movie]) {
         let _ = movies.compactMap{$0.toMovieEntity(context: viewContext)}
         saveContext()
     }
@@ -92,5 +92,42 @@ class CoreDataManager {
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: savedMovieRequest, managedObjectContext: viewContext, sectionNameKeyPath: nil, cacheName: nil)
         return fetchedResultsController
+    }
+    
+    func fetchSavedMovie(with movieId: Int) -> Movie? {
+        let request = SavedMovieEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %d", movieId)
+        do {
+            let result = try viewContext.fetch(request)
+            return result.first?.toMovie()
+        } catch {
+            print("Failed to remove from favorites: \(error)")
+        }
+        return nil
+    }
+    
+    func fetchMovieEntity(with movieId: Int) -> Movie? {
+        let request = MovieEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %d", movieId)
+        do {
+            let result = try viewContext.fetch(request)
+            return result.first?.toMovie()
+        } catch {
+            print("Failed to remove from favorites: \(error)")
+        }
+        return nil
+    }
+    
+    func deleteAllMoviesEntity() {
+        let request = MovieEntity.fetchRequest()
+        do {
+            let result = try viewContext.fetch(request)
+            for entity in result {
+                viewContext.delete(entity)
+            }
+            saveContext()
+        } catch {
+            print("Failed to remove from favorites: \(error)")
+        }
     }
 }

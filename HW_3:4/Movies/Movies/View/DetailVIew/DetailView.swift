@@ -12,6 +12,7 @@ class DetailView: UIView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
+        label.textAlignment = .center
         label.numberOfLines = 0
         label.isHidden = true
         return label
@@ -23,7 +24,7 @@ class DetailView: UIView {
         return imagesCollectionView
     }()
     
-    lazy var segmentedControl: CustomSegmentedControl<String> = {
+    private lazy var segmentedControl: CustomSegmentedControl<String> = {
         let segmentedControl = CustomSegmentedControl<String>(items: ["О фильме", "Каст", "Трейлер"], titleProvider: { $0 })
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
         return segmentedControl
@@ -202,7 +203,8 @@ class DetailView: UIView {
             activityIndicator.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor),
             
-            errorLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            errorLabel.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            errorLabel.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             errorLabel.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor),
         ])
     }
@@ -223,6 +225,7 @@ class DetailView: UIView {
     
     func reloadCollectionView() {
         imagesCollectionView.imagesCollectionView.reloadData()
+        imagesCollectionView.setupController()
     }
     
     func startLoadingMovie() {

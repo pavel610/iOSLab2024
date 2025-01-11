@@ -22,6 +22,7 @@ class TopCollectionViewCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 16
+        imageView.backgroundColor = AppColors.searchGray
         return imageView
     }()
     

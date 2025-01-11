@@ -44,11 +44,8 @@ class MainViewController: UIViewController {
         mainView.listCollectionView.delegate = self
         mainView.listCollectionView.dataSource = allMoviesDataSource
         
-        mainView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
-        mainView.refreshButton.addTarget(self, action: #selector(loadData), for: .touchUpInside)
-        
-        mainView.searchView.iconContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(findMovieByName)))
-        mainView.searchView.searchTextField.delegate = self
+        mainView.nextButtonDelegate = self
+        mainView.searchIconDelegate = self
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: navigationTitleLabel)
     }
 
@@ -60,30 +57,35 @@ class MainViewController: UIViewController {
         mainView.customSegmentedControl.onSegmentSelected = {[weak self] city in
             guard let self = self else { return }
             Task {
-                self.mainView.startUpdatingAllMovies()
-                let allMovies = try await self.dataManager.obtainInitialAllMovies(in: self.mainView.customSegmentedControl.getCurrentValue())
-                //Обновление коллекции при смене города
-                self.mainView.listCollectionView.performBatchUpdates({
-                    let itemCount = self.allMoviesDataSource.getItems().count
-                    let indexPaths = (0..<itemCount).map { IndexPath(item: $0, section: 0) }
-                    self.allMoviesDataSource.removeAll()
-                    self.mainView.listCollectionView.deleteItems(at: indexPaths)
-                    
-                    // После удаления добавляем новые элементы
-                    self.allMoviesDataSource.updateDataSource(with: allMovies)
-                    let newIndexPaths = (0..<self.allMoviesDataSource.getItems().count).map { IndexPath(item: $0, section: 0) }
-                    self.mainView.listCollectionView.insertItems(at: newIndexPaths)
-                }, completion: { isFinished in
-                    self.mainView.finishUpdatingAllMovies()
-                })
+                do {
+                    self.mainView.startUpdatingAllMovies()
+                    let allMovies = try await self.dataManager.obtainInitialAllMovies(in: self.mainView.customSegmentedControl.getCurrentValue())
+                    //Обновление коллекции при смене города
+                    self.mainView.listCollectionView.performBatchUpdates({
+                        let itemCount = self.allMoviesDataSource.getItems().count
+                        let indexPaths = (0..<itemCount).map { IndexPath(item: $0, section: 0) }
+                        self.allMoviesDataSource.removeAll()
+                        self.mainView.listCollectionView.deleteItems(at: indexPaths)
+                        
+                        // После удаления добавляем новые элементы
+                        self.allMoviesDataSource.updateDataSource(with: allMovies)
+                        let newIndexPaths = (0..<self.allMoviesDataSource.getItems().count).map { IndexPath(item: $0, section: 0) }
+                        self.mainView.listCollectionView.insertItems(at: newIndexPaths)
+                    }, completion: { isFinished in
+                        self.mainView.finishUpdatingAllMovies()
+                    })
+                } catch {
+                    self.error = error.localizedDescription
+                }
             }
         }
     }
     
-    @objc private func loadData() {
+    private func loadData() {
         Task {
             do {
-                let movies = try await dataManager.obtainTopMovies()
+                CoreDataManager.shared.deleteAllMoviesEntity()
+                let movies = try await dataManager.obtainAndSaveTopMovies()
                 self.topListDataSource.updateMovies(movies)
                 let cities = try await dataManager.obtainCities()
                 mainView.customSegmentedControl.updateDataSource(with: cities)
@@ -99,48 +101,7 @@ class MainViewController: UIViewController {
             }
         }
     }
-    
-    @objc private func findMovieByName(){
-        let name = mainView.searchView.getText()
-        guard !name.isEmpty else { return }
-        
-        let allItems = allMoviesDataSource.getItems() + topListDataSource.getItems()
-        if let movie = allItems.first(where: {$0.title.lowercased() == name.lowercased()}) {
-            Task {
-                let detailMovie = try await dataManager.obtainDetailInfoById(id: movie.id)
-                let detailViewController = DetailViewController()
-                detailViewController.configure(with: detailMovie)
-                navigationController?.pushViewController(detailViewController, animated: true)
-            }
-        } else {
-            let alert = UIAlertController(title: "", message: "Фильма с таким названием не найдено", preferredStyle: .alert)
-            let ok = UIAlertAction(title: "OK", style: .default, handler: { (action) -> Void in
-            })
-            alert.addAction(ok)
-            present(alert, animated: true)
-        }
-    }
-    
-    @objc private func nextButtonTapped(_ sender: UIButton) {
-        Task {
-            UIView.animate(withDuration: 0.3) {
-                sender.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-            } completion: { _ in
-                UIView.animate(withDuration: 0.1) {
-                    sender.transform = .identity
-                }
-            }
-            let movies = try await dataManager.obtainNextPageAllMovies()
-            
-            mainView.listCollectionView.performBatchUpdates {
-                allMoviesDataSource.addItems(movies)
-                let items = allMoviesDataSource.getItems()
-                let newIndexPaths = ((items.count - movies.count)..<items.count).map { IndexPath(item: $0, section: 0) }
-                mainView.listCollectionView.insertItems(at: newIndexPaths)
-            }
-        }
-    }
-    
+
     @objc private func hideKeyboard(_ sender: UIView) {
         sender.endEditing(true)
     }
@@ -166,21 +127,69 @@ extension MainViewController: UICollectionViewDelegate {
 
         let detailViewController = DetailViewController()
         navigationController?.pushViewController(detailViewController, animated: true)
+        let movie = dataSource.getItemByIndex(indexPath.item) as! Movie
+        var movieForDetailView: Movie?
         Task {
             do {
-                let movie = try await dataManager.obtainDetailInfoById(id: (dataSource.getItemByIndex(indexPath.item) as! Movie).id)
-                detailViewController.configure(with: movie)
+                if CoreDataManager.shared.isSaved(movieID: movie.id) {
+                    movieForDetailView = CoreDataManager.shared.fetchSavedMovie(with: movie.id)!
+                } else {
+                    movieForDetailView = try await dataManager.obtainDetailInfoById(id: movie.id)
+                }
             } catch {
-                detailViewController.error = error.localizedDescription
+                guard let fullMovie = CoreDataManager.shared.fetchMovieEntity(with: movie.id) else {
+                    detailViewController.error = error.localizedDescription
+                    return
+                }
+                movieForDetailView = fullMovie
+            }
+            detailViewController.configure(with: movieForDetailView)
+        }
+    }
+}
+
+extension MainViewController: NextButtonDelegate {
+    func obtainNextMoviesPage(completion: @escaping ()->()) {
+        Task {
+            do {
+                let movies = try await self.dataManager.obtainNextPageAllMovies()
+                
+                self.mainView.listCollectionView.performBatchUpdates {
+                    self.allMoviesDataSource.addItems(movies)
+                    let items = self.allMoviesDataSource.getItems()
+                    let newIndexPaths = ((items.count - movies.count)..<items.count).map { IndexPath(item: $0, section: 0) }
+                    self.mainView.listCollectionView.insertItems(at: newIndexPaths)
+                    completion()
+                }
+            } catch {
+                let alert = UIAlertController(title: "", message: "Что-то пошло не так. Проверьте соединение с интеренетом", preferredStyle: .alert)
+                let ok = UIAlertAction(title: "OK", style: .default, handler: { (action) -> Void in
+                })
+                alert.addAction(ok)
+                self.present(alert, animated: true)
+                completion()
             }
         }
     }
 }
 
-extension MainViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        findMovieByName()
-        textField.resignFirstResponder()
-        return true
+extension MainViewController: SearchIconDelegate {
+    func findMovieByName(name: String) {
+        guard !name.isEmpty else { return }
+        let allItems = allMoviesDataSource.getItems() + topListDataSource.getItems()
+        if let movie = allItems.first(where: {$0.title.lowercased() == name.lowercased()}) {
+            Task {
+                let detailViewController = DetailViewController()
+                navigationController?.pushViewController(detailViewController, animated: true)
+                let detailMovie = try await dataManager.obtainDetailInfoById(id: movie.id)
+                detailViewController.configure(with: detailMovie)
+            }
+        } else {
+            let alert = UIAlertController(title: "", message: "Фильма с таким названием не найдено", preferredStyle: .alert)
+            let ok = UIAlertAction(title: "OK", style: .default, handler: { (action) -> Void in
+            })
+            alert.addAction(ok)
+            present(alert, animated: true)
+        }
     }
 }

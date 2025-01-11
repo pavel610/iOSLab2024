@@ -49,6 +49,9 @@ class ImagesCollectionView: UIView {
     }
     
     func setupController() {
+        let countItems = (imagesCollectionView.dataSource as! (any CollectionDataSourceProtocol)).getItems().count
+        
+        guard countItems > 1 else { return }
         let pagersStack: UIStackView = {
             let pagersStack = UIStackView()
             pagersStack.axis = .horizontal
@@ -58,8 +61,6 @@ class ImagesCollectionView: UIView {
             return pagersStack
         }()
         
-        let countItems = (imagesCollectionView.dataSource as! (any CollectionDataSourceProtocol)).getItems().count
-    
         for tag in 1...countItems {
             let pager = UIView()
             pager.tag = tag

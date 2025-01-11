@@ -8,6 +8,8 @@
 import UIKit
 
 class SearchView: UIView {
+    weak var searchIconDelegate: SearchIconDelegate?
+    
     private lazy var searchIcon: UIImageView = {
         let searchIcon = UIImageView(image: UIImage.searchView.withRenderingMode(.alwaysTemplate))
         searchIcon.tintColor = .gray
@@ -16,13 +18,14 @@ class SearchView: UIView {
         return searchIcon
     }()
     
-    lazy var iconContainer: UIView = {
+    private lazy var iconContainer: UIView = {
         let iconContainer = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 20))
         iconContainer.addSubview(searchIcon)
+        iconContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(searchIconTapped)))
         return iconContainer
     }()
 
-    lazy var searchTextField: UITextField = {
+    private lazy var searchTextField: UITextField = {
         let textField = UITextField()
         textField.font = UIFont.systemFont(ofSize: 16)
         textField.textColor = .white
@@ -45,6 +48,7 @@ class SearchView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
+        searchTextField.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -68,4 +72,20 @@ class SearchView: UIView {
     func getText() -> String {
         searchTextField.text ?? ""
     }
+    
+    @objc private func searchIconTapped() {
+        searchIconDelegate?.findMovieByName(name: searchTextField.text ?? "")
+    }
+}
+
+extension SearchView: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        searchIconTapped()
+        textField.resignFirstResponder()
+        return true
+    }
+}
+
+protocol SearchIconDelegate: AnyObject {
+    func findMovieByName(name: String)
 }

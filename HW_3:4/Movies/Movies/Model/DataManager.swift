@@ -63,15 +63,20 @@ class DataManager {
     }
     
     func getInitialMovies(in city: City) async throws -> [Movie] {
-        if let moviesCoreData = try? CoreDataManager.shared.fetchIntialMovies(), !moviesCoreData.isEmpty {
-            return moviesCoreData
-        } else {
-            let initialMovies: [Movie] = try await obtainInitialAllMovies(in: city)
-            await withCheckedContinuation { continuation in
-                CoreDataManager.shared.saveInitialMovies(movies: initialMovies)
-                continuation.resume()
-            }
-            return initialMovies
+        let initialMovies: [Movie] = try await obtainInitialAllMovies(in: city)
+        await withCheckedContinuation { continuation in
+            CoreDataManager.shared.saveMovieEntities(movies: initialMovies)
+            continuation.resume()
         }
+        return initialMovies
+    }
+    
+    func obtainAndSaveTopMovies() async throws -> [Movie] {
+        let topMovies: [Movie] = try await obtainTopMovies()
+        await withCheckedContinuation { continuation in
+            CoreDataManager.shared.saveMovieEntities(movies: topMovies)
+            continuation.resume()
+        }
+        return topMovies
     }
 }

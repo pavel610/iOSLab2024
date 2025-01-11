@@ -139,7 +139,9 @@ class DescriptionView: UIView {
     }
     
     func configure(with movie: Movie) {
-        yearLabel.text = "\(String(describing: movie.yearOfPublication!))"
+        if let yearOfPublication = movie.yearOfPublication {
+            yearLabel.text = "\(String(describing: yearOfPublication))"
+        }
         durationLabel.text = "\(minutesWord(for: movie.runningTime ?? 0))"
         genreLabel.text = genreList(genres: movie.genres ?? [])
     }

@@ -13,21 +13,19 @@ import CoreData
 public class MovieEntity: NSManagedObject {
     func toMovie() -> Movie? {
         guard let title = title,
-              let poster = (try? JSONDecoder().decode(Image.self, from: poster ?? Data())),
-              let imagesArray = (try? JSONDecoder().decode([Image].self, from: images ?? Data())),
-              let genresArray = (try? JSONDecoder().decode([Genre].self, from: genres ?? Data())) else { return nil }
+              let poster = (try? JSONDecoder().decode(Image.self, from: poster ?? Data())) else { return nil }
         return Movie(
             id: Int(id),
             title: title,
-            description: body_text,
-            yearOfPublication: Int(year),
-            trailerUrl: trailer,
-            stars: stars,
-            runningTime: Int(running_time),
+            description: nil,
+            yearOfPublication: nil,
+            trailerUrl: nil,
+            stars: nil,
+            runningTime: nil,
             poster: poster,
-            images: imagesArray,
-            genres: genresArray,
-            rating: imdb_rating
+            images: nil,
+            genres: nil,
+            rating: nil
         )
     }
 }

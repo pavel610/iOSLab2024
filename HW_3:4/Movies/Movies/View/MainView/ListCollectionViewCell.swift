@@ -22,6 +22,7 @@ class ListCollectionViewCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 16
+        imageView.backgroundColor = .searchGray
         return imageView
     }()
     

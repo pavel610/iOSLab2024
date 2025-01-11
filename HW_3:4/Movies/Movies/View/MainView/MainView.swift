@@ -8,8 +8,7 @@
 import UIKit
 
 class MainView: UIView {
-    lazy var searchView = SearchView()
-    
+    private lazy var searchView = SearchView()
     lazy var customSegmentedControl: CustomSegmentedControl = {
         let customSegmentedControl = CustomSegmentedControl<City>(items: [], titleProvider: {$0.name})
         customSegmentedControl.collectionView.contentInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 10)
@@ -24,15 +23,6 @@ class MainView: UIView {
         label.numberOfLines = 0
         label.isHidden = true
         return label
-    }()
-    
-    lazy var refreshButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Обновить", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.isHidden = true
-        return button
     }()
     
     private lazy var activityIndicator: UIActivityIndicatorView = {
@@ -100,13 +90,34 @@ class MainView: UIView {
         return view
     }()
     
-    lazy var nextButton: UIButton = {
-        let button = UIButton()
+    private lazy var nextButton: UIButton = {
+        let action = UIAction {[weak self] _ in
+            guard let self = self else { return }
+            UIView.animate(withDuration: 0.3) {
+                self.nextButton.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+            } completion: {[weak self] _ in
+                guard let self = self else { return }
+                self.nextButton.isHidden = true
+                nextButtonDelegate?.obtainNextMoviesPage {
+                    self.nextButton.transform = .identity
+                    self.nextButton.isHidden = false
+                }
+            }
+        }
+        let button = UIButton(primaryAction: action)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Дальше", for: .normal)
+        button.setTitleColor(.white, for: .normal)
         button.isHidden = true
         return button
     }()
+    
+    weak var nextButtonDelegate: NextButtonDelegate?
+    weak var searchIconDelegate: SearchIconDelegate? {
+        didSet {
+            searchView.searchIconDelegate = searchIconDelegate
+        }
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -124,7 +135,6 @@ class MainView: UIView {
         addSubview(activityIndicator)
         addSubview(listActivityIndicator)
         addSubview(errorLabel)
-        addSubview(refreshButton)
         
         searchView.translatesAutoresizingMaskIntoConstraints = false
         customSegmentedControl.translatesAutoresizingMaskIntoConstraints = false
@@ -173,8 +183,6 @@ class MainView: UIView {
             errorLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
             errorLabel.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor),
             
-            refreshButton.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            refreshButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor, constant: 10),
         ])
     }
     
@@ -206,15 +214,15 @@ class MainView: UIView {
     }
     
     func showErrorLabel(with error: String) {
+        scrollView.isHidden = true
         errorLabel.isHidden = false
-        refreshButton.isHidden = false
         activityIndicator.isHidden = true
         errorLabel.text = error
     }
     
     func hideErrorLabel() {
+        scrollView.isHidden = false
         errorLabel.isHidden = true
-        refreshButton.isHidden = true
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
         errorLabel.text = nil
@@ -223,4 +231,8 @@ class MainView: UIView {
     func stopLoadingPageAnimation() {
         activityIndicator.stopAnimating()
     }
+}
+
+protocol NextButtonDelegate: AnyObject {
+    func obtainNextMoviesPage(completion: @escaping ()->())
 }

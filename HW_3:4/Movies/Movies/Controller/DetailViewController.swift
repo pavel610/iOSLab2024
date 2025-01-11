@@ -8,9 +8,9 @@
 import UIKit
 
 class DetailViewController: UIViewController {
-    let detailView = DetailView()
-    let imagesDataSource = ImagesDataSource(images: [])
-    var movie: Movie?
+    private let detailView = DetailView()
+    private let imagesDataSource = ImagesDataSource(images: [])
+    private var movie: Movie?
     
     var error: String? {
         didSet {
@@ -22,7 +22,7 @@ class DetailViewController: UIViewController {
         }
     }
     
-    lazy var rigthView: UIImageView = {
+    private lazy var saveTabBarItem: UIImageView = {
         let imageView = UIImageView()
         imageView.image = .bookmark
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -30,17 +30,25 @@ class DetailViewController: UIViewController {
         return imageView
     }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         detailView.imagesCollectionView.imagesCollectionView.delegate = self
         detailView.imagesCollectionView.imagesCollectionView.dataSource = imagesDataSource
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         setupNavigationBar()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         if let movie = movie {
             let isMovieSaved = CoreDataManager.shared.isSaved(movieID: movie.id)
-            rigthView.image = isMovieSaved ? .bookmarkFilled : .bookmark
+            saveTabBarItem.image = isMovieSaved ? .bookmarkFilled : .bookmark
         }
     }
     
@@ -52,7 +60,7 @@ class DetailViewController: UIViewController {
         let navBar = navigationController!.navigationBar
         navigationItem.title = "Подробно"
         navBar.tintColor = .white
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rigthView)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: saveTabBarItem)
         
         navigationItem.hidesBackButton = true
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: #selector(backButtonTapped))
@@ -65,10 +73,9 @@ class DetailViewController: UIViewController {
         detailView.stopLoadingMovie()
         imagesDataSource.updateDataSource(movie.images ?? [])
         detailView.reloadCollectionView()
-        detailView.imagesCollectionView.setupController()
         
         let isMovieSaved = CoreDataManager.shared.isSaved(movieID: movie.id)
-        rigthView.image = isMovieSaved ? .bookmarkFilled : .bookmark
+        saveTabBarItem.image = isMovieSaved ? .bookmarkFilled : .bookmark
     }
     
     //MARK: objc methods
@@ -82,8 +89,13 @@ class DetailViewController: UIViewController {
             CoreDataManager.shared.saveSavedMovie(movie: movie)
         }
         
-        UIView.animate(withDuration: 0.3) {
-            self.rigthView.image = !isMovieSaved ? .bookmarkFilled : .bookmark
+        UIView.animate(withDuration: 0.2) {
+            self.saveTabBarItem.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+            self.saveTabBarItem.image = !isMovieSaved ? .bookmarkFilled : .bookmark
+        } completion: { _ in
+            UIView.animate(withDuration: 0.2) {
+                self.saveTabBarItem.transform = .identity
+            }
         }
     }
     
