@@ -50,7 +50,7 @@ class ImagesCollectionViewCell: UICollectionViewCell {
     
     func configure(with image: Image) {
         Task {
-            imageView.image = try? await ImageService.shared.downloadImage(url: image.image)
+            imageView.image = (try? await ImageService.shared.downloadImage(url: image.image)) ?? .default
             activityIndicator.stopAnimating()
         }
     }

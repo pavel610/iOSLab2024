@@ -73,6 +73,7 @@ class DetailView: UIView {
         imageView.layer.cornerRadius = 16
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
+        imageView.backgroundColor = .searchGray
         return imageView
     }()
     

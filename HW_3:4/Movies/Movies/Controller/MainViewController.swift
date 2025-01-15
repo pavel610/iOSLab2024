@@ -75,6 +75,7 @@ class MainViewController: UIViewController {
                         self.mainView.finishUpdatingAllMovies()
                     })
                 } catch {
+                    self.mainView.finishUpdatingAllMovies()
                     self.error = error.localizedDescription
                 }
             }
