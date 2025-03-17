@@ -54,6 +54,10 @@ class ImagesCollectionViewCell: UICollectionViewCell {
             activityIndicator.stopAnimating()
         }
     }
+    
+    override func prepareForReuse() {
+        imageView.image = nil
+    }
 }
 
 extension ImagesCollectionViewCell {

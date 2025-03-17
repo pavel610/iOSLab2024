@@ -51,11 +51,14 @@ class ListCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(with movie: Movie) {
-        imageView.image = nil
         Task {
             imageView.image = try? await ImageService.shared.downloadImage(url: movie.poster.image)
             activityIndicator.stopAnimating()
         }
+    }
+    
+    override func prepareForReuse() {
+        imageView.image = nil
     }
 }
 

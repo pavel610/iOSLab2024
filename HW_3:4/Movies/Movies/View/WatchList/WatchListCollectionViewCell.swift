@@ -162,7 +162,6 @@ class WatchListCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(with movie: Movie) {
-        posterImageView.image = nil
         titleLabel.text = movie.title
         genreLabel.text = genreList(genres: movie.genres ?? [])
         yearLabel.text = String(describing: movie.yearOfPublication!)
@@ -171,6 +170,10 @@ class WatchListCollectionViewCell: UICollectionViewCell {
         Task {
             posterImageView.image = (try? await ImageService.shared.downloadImage(url: movie.poster.image)) ?? .default
         }
+    }
+    
+    override func prepareForReuse() {
+        posterImageView.image = nil
     }
 }
 

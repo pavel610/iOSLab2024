@@ -30,5 +30,4 @@ public class SavedMovieEntity: NSManagedObject {
             rating: imdb_rating
         )
     }
-
 }

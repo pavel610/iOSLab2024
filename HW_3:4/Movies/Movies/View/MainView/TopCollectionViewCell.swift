@@ -8,6 +8,8 @@
 import UIKit
 
 class TopCollectionViewCell: UICollectionViewCell {
+    private var imageTask: Task<Void, Never>?
+    
     private lazy var activityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView()
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
@@ -64,13 +66,23 @@ class TopCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(with movie: Movie, index: Int) {
-        imageView.image = nil
         activityIndicator.startAnimating()
         numberLabel.text = "\(index + 1)"
-        Task {
+        imageTask = Task {
+            defer { activityIndicator.stopAnimating() }
             imageView.image = try? await ImageService.shared.downloadImage(url: movie.poster.image)
-            activityIndicator.stopAnimating()
         }
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        imageView.image = nil
+        cancelImageDownload()
+    }
+    
+    private func cancelImageDownload() {
+        imageTask?.cancel()
+        imageTask = nil
     }
 }
 
