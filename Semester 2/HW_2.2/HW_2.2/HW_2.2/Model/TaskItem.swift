@@ -6,7 +6,7 @@
 //
 import Foundation
 
-protocol Storable: Codable, Identifiable {}
+protocol Storable: Codable, Identifiable, Hashable {}
 
 struct TaskItem: Storable {
     let id: UUID
