@@ -14,12 +14,17 @@ final class NotificationFactory {
         content.sound = .default
         content.userInfo = ["screenLink": "healthreminder://openScreen?screen=detail&id=\(reminder.id)"]
 
-        let triggerDate = Calendar.current.dateComponents(
-            [.year, .month, .day, .hour, .minute],
-            from: reminder.date
-        )
-
-        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
+        let trigger: UNNotificationTrigger
+        
+        switch reminder.repeatMode {
+        case .once:
+            let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: reminder.date)
+            trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+            
+        case .interval:
+            let interval = TimeInterval((reminder.intervalMinutes ?? 5) * 60)
+            trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: true)
+        }
         
         return UNNotificationRequest(
             identifier: reminder.id.uuidString,

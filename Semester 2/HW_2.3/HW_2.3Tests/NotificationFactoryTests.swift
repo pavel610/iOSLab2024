@@ -27,7 +27,7 @@ final class NotificationFactoryTests: XCTestCase {
         // given
         let id = UUID()
         let date = Date(timeIntervalSince1970: 1_714_569_600)
-        let reminder = Reminder(id: id, title: "Drink Water", date: date, type: .water)
+        let reminder = Reminder(id: id, title: "Drink Water", date: date, type: .water, repeatMode: .once, intervalMinutes: nil)
 
         // when
         let request = factory.makeNotification(from: reminder)

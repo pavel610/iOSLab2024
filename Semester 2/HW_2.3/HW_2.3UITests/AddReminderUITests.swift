@@ -16,7 +16,7 @@ final class AddReminderUITests: XCTestCase {
         app.launch()
     }
 
-    func testAddReminderFlow() throws {
+    func test_AddReminderFlow() throws {
         let addButton = app.navigationBars.buttons.element(boundBy: 0)
         XCTAssertTrue(addButton.exists)
         addButton.tap()

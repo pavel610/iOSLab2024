@@ -31,7 +31,9 @@ final class ReminderSnapshotTests: XCTestCase {
             id: UUID(),
             title: "Выпей воды",
             date: Date(timeIntervalSince1970: 1_714_569_600),
-            type: .water
+            type: .water,
+            repeatMode: .once,
+            intervalMinutes: nil
         )
         let view = DetailedReminderView(reminder: reminder)
         let vc = UIHostingController(rootView: view)

@@ -11,15 +11,6 @@ struct Reminder: Identifiable {
     let title: String
     let date: Date
     let type: ReminderType
-}
-
-enum ReminderType: String, CaseIterable {
-    case water = "Пить воду"
-    case stretch = "Сделать разминку"
-    case vitamins = "Витамины"
-    case sleep = "Лечь спать"
-    case exercise = "Зарядка"
-    case meal = "Приём пищи"
-    case breathing = "Дыхательные упражнения"
-    case custom = "Другое"
+    let repeatMode: RepeatMode
+    let intervalMinutes: Int?
 }

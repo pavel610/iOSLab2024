@@ -28,7 +28,7 @@ final class ReminderServiceTests: XCTestCase {
 
     func test_addReminder_shouldStoreReminder() {
         // given
-        let reminder = Reminder(id: UUID(), title: "Test", date: Date(), type: .breathing)
+        let reminder = Reminder(id: UUID(), title: "Test", date: Date(), type: .breathing, repeatMode: .once, intervalMinutes: nil)
 
         // when
         service.add(reminder)
@@ -40,7 +40,7 @@ final class ReminderServiceTests: XCTestCase {
     func test_remindersPublisher_shouldPublishChanges() {
         // given
         let expectation = XCTestExpectation(description: "Should receive reminder")
-        let reminder = Reminder(id: UUID(), title: "Published", date: Date(), type: .water)
+        let reminder = Reminder(id: UUID(), title: "Published", date: Date(), type: .water, repeatMode: .once, intervalMinutes: nil)
 
         var receivedReminders: [Reminder] = []
 

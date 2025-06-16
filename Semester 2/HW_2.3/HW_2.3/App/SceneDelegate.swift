@@ -91,7 +91,7 @@ extension SceneDelegate {
                         .setId(uuid)
                         .setTitle("UI-тест напоминание")
                         .setDate(Date().addingTimeInterval(600))
-                        .setType(.custom)
+                        .setType(.other)
                         .build()
                     ServiceLocator.shared.remindersService.add(reminder)
                 }

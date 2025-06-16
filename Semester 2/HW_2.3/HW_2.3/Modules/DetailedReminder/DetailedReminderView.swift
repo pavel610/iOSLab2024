@@ -11,26 +11,37 @@ struct DetailedReminderView: View {
     var reminder: Reminder
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             HStack(alignment: .center) {
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(reminder.title)
-                        .bold()
                         .font(.title)
+                        .bold()
+
                     Text(reminder.type.rawValue)
                         .font(.callout)
                         .foregroundStyle(.gray)
                 }
-            
+
                 Spacer()
-                
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text("\(reminder.date.formatted(date: .omitted, time: .shortened))")
-                        .bold()
-                    Text("\(reminder.date.formatted(date: .numeric, time: .omitted))")
-                        .foregroundStyle(.gray)
+
+                if reminder.repeatMode == .once {
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text(reminder.date.formatted(date: .omitted, time: .shortened))
+                            .bold()
+                        Text(reminder.date.formatted(date: .numeric, time: .omitted))
+                            .foregroundStyle(.gray)
+                    }
+                } else if let interval = reminder.intervalMinutes {
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("Каждые \(interval) мин")
+                            .bold()
+                        Text("Повтор")
+                            .foregroundStyle(.gray)
+                    }
                 }
             }
+
             Spacer()
         }
         .padding()
@@ -38,5 +49,5 @@ struct DetailedReminderView: View {
 }
 
 #Preview {
-    DetailedReminderView(reminder: Reminder(id: UUID(), title: "Иди пей", date: Date(), type: .water))
+    DetailedReminderView(reminder: Reminder(id: UUID(), title: "Иди пей", date: Date(), type: .water, repeatMode: .once, intervalMinutes: nil))
 }

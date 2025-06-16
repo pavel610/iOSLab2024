@@ -12,16 +12,39 @@ struct AddReminderView: View {
     @State private var title: String = ""
     @State private var date: Date = Date()
     @State private var selectedType: ReminderType = .water
-    let notificationService: NotificationServiceProtocol = ServiceLocator.shared.notificationService
-    let reminderService: ReminderServiceProtocol = ServiceLocator.shared.remindersService
+    @State private var repeatMode: RepeatMode = .once
+    @State private var intervalMinutes: Int = 5
+
+    let notificationService: NotificationServiceProtocol
+    let reminderService: ReminderServiceProtocol
     
+    init(notificationService: NotificationServiceProtocol = ServiceLocator.shared.notificationService,
+         reminderService: ReminderServiceProtocol = ServiceLocator.shared.remindersService) {
+        self.notificationService = notificationService
+        self.reminderService = reminderService
+    }
+
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottom) {
                 Form {
                     Section {
                         TextField("Название", text: $title)
-                        DatePicker("Когда", selection: $date)
+                        Picker("Повтор", selection: $repeatMode) {
+                            ForEach(RepeatMode.allCases, id: \.self) {
+                                Text($0.rawValue)
+                            }
+                        }
+
+                        if repeatMode == .once {
+                            DatePicker("Когда", selection: $date)
+                        } else {
+                            Stepper(value: $intervalMinutes, in: 5...60, step: 5) {
+                                Text("Интервал: \(intervalMinutes) мин")
+                            }
+
+                        }
+
                         Picker("Тип", selection: $selectedType) {
                             ForEach(ReminderType.allCases, id: \.self) {
                                 Text($0.rawValue)
@@ -53,6 +76,8 @@ struct AddReminderView: View {
             .setTitle(title)
             .setDate(date)
             .setType(selectedType)
+            .setRepeatMode(repeatMode)
+            .setIntervalMinutes(repeatMode == .interval ? intervalMinutes : nil)
             .build()
         reminderService.add(reminder)
         

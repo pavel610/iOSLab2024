@@ -10,7 +10,9 @@ final class ReminderBuilder {
     private var id = UUID()
     private var title: String = ""
     private var date: Date = Date()
-    private var type: ReminderType = .custom
+    private var type: ReminderType = .other
+    private var repeatMode: RepeatMode = .once
+    private var intervalMinutes: Int? = nil
 
     func setId(_ id: UUID) -> Self {
         self.id = id
@@ -31,8 +33,23 @@ final class ReminderBuilder {
         self.type = type
         return self
     }
+
+    func setRepeatMode(_ mode: RepeatMode) -> Self {
+        self.repeatMode = mode
+        return self
+    }
+
+    func setIntervalMinutes(_ minutes: Int?) -> Self {
+        self.intervalMinutes = minutes
+        return self
+    }
  
     func build() -> Reminder {
-        Reminder(id: id, title: title, date: date, type: type)
+        Reminder(id: id,
+                 title: title,
+                 date: date,
+                 type: type,
+                 repeatMode: repeatMode,
+                 intervalMinutes: intervalMinutes)
     }
 }

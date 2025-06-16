@@ -16,7 +16,7 @@ final class DetailedReminderUITests: XCTestCase {
         app.launchArguments.append("--uitesting")
     }
     
-    func testReminderDeeplinkOpensDetailScreen() {
+    func test_ReminderDeeplinkOpensDetailScreen() {
         let reminderId = UUID().uuidString
         let deeplinkURL = "healthreminder://openScreen?screen=detail&id=\(reminderId)"
         
